@@ -11,7 +11,7 @@ class Ingredient(models.Model):
         return self.title 
 
 
-class Tags(models.Model):
+class Tag(models.Model):
     name = models.CharField(max_length=10)
     slug = models.SlugField(unique=True, max_length=100, blank=True, null=True)
     color = models.CharField(max_length=15, blank=True, null=True)
@@ -26,9 +26,9 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipes/', blank=True, null=True)
     description = models.TextField()
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient') # рецепты, для которых нужен ингредиент
-    tag = models.ManyToManyField(Tags)
+    tags = models.ManyToManyField(Tag)
     cooking_time = models.IntegerField()
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     pub_date = models.DateTimeField('date published', auto_now_add=True)
 
     def __str__(self):
