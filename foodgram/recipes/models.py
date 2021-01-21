@@ -26,7 +26,7 @@ class Recipe(models.Model):
     image = models.ImageField(upload_to='recipes/', blank=True, null=True)
     description = models.TextField()
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient') # рецепты, для которых нужен ингредиент
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, related_name='tag_recipe')
     cooking_time = models.IntegerField()
     slug = models.SlugField(unique=True, blank=True, null=True)
     pub_date = models.DateTimeField('date published', auto_now_add=True)

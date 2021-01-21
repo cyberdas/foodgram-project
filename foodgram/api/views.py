@@ -9,4 +9,4 @@ from django.views.decorators.http import require_http_methods
 def get_ingredients(request):
     query = request.GET.get('query')
     ingredients = Ingredient.objects.filter(title__contains=query).values('title','dimension')
-    return JsonResponse({"test": list(ingredients)}, safe=True)
+    return JsonResponse(list(ingredients), safe=False)

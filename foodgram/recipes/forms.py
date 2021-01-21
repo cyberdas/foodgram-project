@@ -4,5 +4,5 @@ from .models import Recipe, RecipeIngredient, Tag, Ingredient
 class RecipeForm(forms.ModelForm):
     class Meta:
         model= Recipe
-        fields = ('title', 'tags', 'image', 'ingredients', 'description', 'cooking_time', 'slug')
+        fields = ('title', 'tags', 'image', 'description', 'cooking_time')
         # exclude = ('tags', 'ingredients')
