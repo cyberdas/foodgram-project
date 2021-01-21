@@ -84,11 +84,11 @@
             <div class="form__group">
                 <span class="form__label">Загрузить фото</span>
                 <div class="form__field-group">
-                    {{ form.image }}
-                    <!-- <label for="{{ form.image.id_for_label }}" class="form__file-button">Выбрать файл</label> -->
-                    <!--  <input type="file" name="file_name" id="{{ form.image.id_for_label }}" class="form__file"> -->
+                    <label for="{{ form.image.id_for_label }}" class="form__file-button">Выбрать файл</label>
+                    <input type="file" id="{{ form.image.id_for_label }}" class="form__file">
                     <span class="form__error">{{form.image.errors}}</span>
                 </div>
+                <div id="filename"class="form__file-name"></div>
             </div>
             <div class="form__footer">
                 <button class="button button_style_blue">Создать рецепт</button>
@@ -106,5 +106,6 @@
 <script src="{% static 'js/utils/debouncing.js' %}"></script>
 <script src="{% static 'js/api/Api.js' %}"></script>
 <script src="{% static 'formRecipe.js' %}"></script>
+<script src="{% static 'filename.js' %}"></script>
 </body>
 </html>
