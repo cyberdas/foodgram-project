@@ -1,5 +1,5 @@
-var input = document.getElementById( 'file-upload' );
-var infoArea = document.getElementById( 'file-upload-filename' );
+var input = document.getElementById( 'id_image' );
+var infoArea = document.getElementById( 'filename' );
 
 input.addEventListener( 'change', showFileName );
 
