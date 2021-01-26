@@ -17,7 +17,7 @@ class Tag(models.Model):
     color = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return self.slug
+        return self.name
 
 
 class Recipe(models.Model):
@@ -39,5 +39,5 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients') # все ингредиенты рецепта
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField()
-    def get_ingredients(self, recipe, ingredient, amount):
-        pass
+    # def save_ingredients(self, recipe, ingredient, amount):
+        # pass

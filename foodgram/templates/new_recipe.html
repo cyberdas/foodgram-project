@@ -19,7 +19,7 @@
         <h1 class="main__title">Создание рецепта</h1>
     </div>
     <div class="form-container">
-        <form class="form" action="{% url 'new_recipe' %}" method="POST" enctype="multipart/form-data">
+        <form class="form" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form__group">
                 <label for="{{ form.title.id_for_label }}" class="form__label">Название рецепта</label>
@@ -32,8 +32,14 @@
                 <p class="form__label">Теги</p>
                 <div class="form__field-group">
                     <div class="tags">
-                        <div class="tags__item">
-                            <input type="checkbox" name="breakfast" id="id_breakfast" class="tags__checkbox tags__checkbox_style_orange">
+                        {% for tag in all_tags|all_tags %}
+                        <div class="tags_items">
+                            <input type="checkbox" name="tags" id="{{tag.slug}}" value="{{ tag.slug }}" class="tags__checkbox tags__checkbox_style_{{tag.color}}">
+                            <label name="checkbox_label" for="{{ tag.slug }}" class="tags__label">{{tag.name}}</label>
+                        </div>
+                         {% endfor %}
+                         <!--<div class="tags__item">
+                            <input type="checkbox" name="breakfast" id="id_breakfast" class="tags__checkbox tags__checkbox_style_orange"checked>
                             <label for="id_breakfast" class="tags__label">Завтрак</label>
                         </div>
                         <div class="tags__item">
@@ -43,9 +49,13 @@
                         <div class="tags__item">
                             <input type="checkbox" name="dinner" id="id_dinner" class="tags__checkbox tags__checkbox_style_purple" checked>
                             <label for="id_dinner" class="tags__label">Ужин</label>
-                        </div>
+                        </div> -->
                     </div>
-                    <span class="form__error"></span>
+                    {% if form.errors %}
+                        {% for error in form.tags.errors %}
+                      <span class="form__error">{{ error|escape }}</span>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </div>
             <div class="form__group">

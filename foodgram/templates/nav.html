@@ -2,7 +2,7 @@
     <div class="nav__container container">
         <ul class="nav__items list">
             {% url 'index' as url %}
-            <li class="nav__item {% if request.path == url %} nav__item_active {% endif %}"><a href="#" class="nav__link link">Рецепты</a></li>
+            <li class="nav__item {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
             {% if user.is_authenticated %}
             <li class="nav__item"><a href="#" class="nav__link link">Мои подписки</a></li>
             {% url 'new_recipe' as url %}
