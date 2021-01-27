@@ -3,12 +3,21 @@ from .forms import RecipeForm
 from .models import Recipe, RecipeIngredient, Tag, Ingredient
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.core.paginator import Paginator
 from django.shortcuts import redirect, get_object_or_404
 from .utils import get_ingredients
 
-# Create your views here.
+
 def index(request):
-    return render(request, 'index.html', {})
+    recipes = Recipe.objects.order_by("-pub_date").all()
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    context = {
+        "page": page,
+        "paginator": paginator
+    }
+    return render(request, 'index.html', context)
 
 @login_required
 def new_recipe(request):    
