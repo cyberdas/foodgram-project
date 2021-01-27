@@ -17,7 +17,7 @@ def new_recipe(request):
         if form.is_valid():
             new_recipe = form.save(commit=False)
             new_recipe.author = request.user
-            # new.reciper.tags.add()
+            # new.recipe.tags.add()
             new_recipe.save()
             ingredients = get_ingredients(request)
             # сохраняем каждый ингредиент в рецепт
@@ -29,4 +29,5 @@ def new_recipe(request):
             return redirect(reverse('index'))
         return render(request, 'new_recipe.html', {'form': form}) # не проходит валидацию
     form = RecipeForm()
-    return render(request, 'new_recipe.html', {"form": form})
+    tags = Tag.objects.all()
+    return render(request, 'new_recipe.html', {"form": form, "tags": tags})

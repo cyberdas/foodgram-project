@@ -32,30 +32,23 @@
                 <p class="form__label">Теги</p>
                 <div class="form__field-group">
                     <div class="tags">
-                        {% for tag in all_tags|all_tags %}
-                        <div class="tags_items">
-                            <input type="checkbox" name="tags" id="{{tag.slug}}" value="{{ tag.slug }}" class="tags__checkbox tags__checkbox_style_{{tag.color}}">
-                            <label name="checkbox_label" for="{{ tag.slug }}" class="tags__label">{{tag.name}}</label>
-                        </div>
-                         {% endfor %}
-                         <!--<div class="tags__item">
-                            <input type="checkbox" name="breakfast" id="id_breakfast" class="tags__checkbox tags__checkbox_style_orange"checked>
-                            <label for="id_breakfast" class="tags__label">Завтрак</label>
-                        </div>
+                        {%  for tag in tags %}
                         <div class="tags__item">
-                            <input type="checkbox" name="lunch" id="id_lunch" class="tags__checkbox tags__checkbox_style_green" checked>
-                            <label for="id_lunch" class="tags__label">Обед</label>
+                            <input 
+                                type="checkbox" 
+                                name="tags" 
+                                value="{{ tag.pk }}"
+                                id="id_{{ tag.slug }}"
+                                class="tags__checkbox tags__checkbox_style_{{ tag.color }}">
+                            <label for="id_{{ tag.slug }}" class="tags__label">{{ tag.name }}</label>
                         </div>
-                        <div class="tags__item">
-                            <input type="checkbox" name="dinner" id="id_dinner" class="tags__checkbox tags__checkbox_style_purple" checked>
-                            <label for="id_dinner" class="tags__label">Ужин</label>
-                        </div> -->
+                        {% endfor %}
                     </div>
                     {% if form.errors %}
-                        {% for error in form.tags.errors %}
+                    {% for error in form.tag.errors %}
                       <span class="form__error">{{ error|escape }}</span>
-                        {% endfor %}
-                    {% endif %}
+                    {% endfor %}
+                  {% endif %}
                 </div>
             </div>
             <div class="form__group">

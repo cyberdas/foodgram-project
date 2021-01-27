@@ -13,7 +13,7 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=10)
-    slug = models.SlugField(unique=True, max_length=100, blank=True, null=True)
+    slug = models.SlugField(unique=True, max_length=100, blank=True, null=True) # value
     color = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
