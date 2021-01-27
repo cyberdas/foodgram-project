@@ -23,7 +23,7 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author_recipes')
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
+    image = models.ImageField(upload_to='recipes/')
     description = models.TextField()
     ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient') # рецепты, для которых нужен ингредиент
     tags = models.ManyToManyField(Tag, related_name='tag_recipe')

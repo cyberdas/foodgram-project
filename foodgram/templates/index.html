@@ -44,13 +44,13 @@
                 </ul>
                 <div class="card__items card__items_column">
                     <p class="card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
-                    <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black">{{ recipe.author }}</a></p> <!-- ссылка на страницу автора -->
+                    <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black">{{ recipe.author.first_name }}</a></p> <!-- ссылка на страницу автора -->
                 </div>
                 <div class="card__footer">
                     <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
                 </div>
             </div>
-            </div>
+        </div>
             {% endfor %}
         </div>
         <nav class="pagination" aria-label="Search results pages">
