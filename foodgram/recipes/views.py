@@ -1,15 +1,16 @@
 from django.shortcuts import render # иморты по pep8
 from .forms import RecipeForm
-from .models import Recipe, RecipeIngredient, Tag, Ingredient
+from .models import Recipe, RecipeIngredient, Tag, Ingredient, User
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, get_object_or_404
 from .utils import get_ingredients
+from django.db.models import Prefetch
 
 
 def index(request):
-    recipes = Recipe.objects.order_by("-pub_date").all()
+    recipes = Recipe.objects.select_related("author").order_by("-pub_date").all()
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -20,7 +21,8 @@ def index(request):
     return render(request, 'index.html', context)
 
 @login_required
-def new_recipe(request):    
+def new_recipe(request):
+    tags = Tag.objects.all() 
     if request.method == "POST":
         form = RecipeForm(request.POST, files=request.FILES)
         if form.is_valid():
@@ -36,7 +38,38 @@ def new_recipe(request):
             form.save_m2m()
             # add ingredients/tags
             return redirect(reverse('index'))
-        return render(request, 'new_recipe.html', {'form': form}) # не проходит валидацию
-    form = RecipeForm()
-    tags = Tag.objects.all()
+        return render(request, 'new_recipe.html', {"form": form, "tags": tags})
+    form = RecipeForm() 
     return render(request, 'new_recipe.html', {"form": form, "tags": tags})
+
+
+def profile_page(request, username):
+    user = get_object_or_404(User, username=username)
+    recipes = Recipe.objects.filter(author=user).order_by("-pub_date").all()
+    # tags = recipes.tags
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    context = {
+        "page": page,
+        "paginator": paginator,
+        "user": user,
+        # "tags": tags
+    }
+    return render(request, 'profile_page.html', context)
+
+
+def recipe_page(request, username, recipe_id):
+    tags = Tag.objects.all()
+    user = get_object_or_404(User, username=username)
+    recipes = Recipe.objects.filter(author=user).select_related("author").order_by("-pub_date").all()
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    context = {
+        "page": page,
+        "paginator": paginator,
+        "tags": tags
+    }
+        # Recipe.objects.prefetch_related.filter().order_by()
+    return render(request, 'recipe_page.html', context)

@@ -15,7 +15,7 @@
   </header>
     <main class="main container">
         <div class="main__header">
-            <h1 class="main__title">Рецепты</h1>
+            <h1 class="main__title">{{user.username}}</h1>
             <ul class="tags">
                 <li class="tags__item">
                     <a id="breakfast" class="tags__checkbox tags__checkbox_style_orange tags__checkbox_active" href="#"></a>
@@ -30,28 +30,34 @@
                     <label for="dinner" class="tags__label">Ужин</label>
                 </li>
             </ul>
+
         </div>
-        <div class="card-list">
+<!--        <p style="padding: 0 0 2em 0;"><a class="button button_style_light-blue" href="#">Подписаться на автора</a></p>-->
+        <div class="author-subscribe" data-author="323">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+        </div>
+        <div class="card-list" >
             {% for recipe in page %}
-            <div class="card" data-id="{{recipe.id}}">
-            <a href="#" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a> <!-- ссылка на рецепт?-->
+        <div class="card" data-id="{{recipe.id}}">
+            <a href="#" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a>
             <div class="card__body">
                 <a class="card__title link" href="#" target="_blank">{{recipe.title}}</a>
                 <ul class="card__items">
-                    {% for tag in recipe.tags.all %} <!-- лишние запросы к бд-->
-                    <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
+                    {% for tag in recipe.tags.all %}
+                    <li class="card__item"><span class="badge badge_style_{{tag.color}}">{{tag.name}}</span></li>
                     {% endfor %}
                 </ul>
                 <div class="card__items card__items_column">
-                    <p class="card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
-                    <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile_page' recipe.author.username %}" style="color: black">{{ recipe.author }}</a></p> <!-- ссылка на страницу автора -->
-                </div>
-                <div class="card__footer">
-                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                    <p class="card__text"><span class="icon-time"></span> {{recipe.cooking_time}} мин.</p>
+                    <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile_page' user.username %}" style="color: black">{{user.username}}</a></p>
                 </div>
             </div>
+            <div class="card__footer">
+                <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
+            </div>
         </div>
-            {% endfor %}
+        {% endfor %}
         </div>
         <nav class="pagination" aria-label="Search results pages">
             <ul class="pagination__container">
@@ -68,19 +74,20 @@
             {% include 'paginator.html' %}   
         {% endif %}
     </main>
+    <footer class="footer">
     {% include 'footer.html' %}
-<script src="{% static 'js/components/MainCards.js' %}"></script>
+    </footer>
+  <script src="{% static 'js/components/MainCards.js' %}"></script>
 
-<script src="{% static 'js/components/Purchases.js' %}"></script>
-    
-<script src="{% static 'js/config/config.js' %}"></script>
-<script src="{% static 'js/components/CardList.js' %}"></script>
-<script src="{% static 'js/components/Header.js' %}"></script>
-<script src="{% static 'js/api/Api.js' %}"></script>
-    {% if user.is_authenticated %}
-<script src="{% static 'indexAuth.js' %}"></script>
-    {% else %}
-<script src="{% static 'indexNotAuth.js' %}"></script>
-    {% endif %}
+  <script src="{% static 'js/components/Purchases.js' %}"></script>
+  <script src="{% static 'js/components/Favorites.js' %}"></script>
+  <script src="{% static 'js/components/Subscribe.js' %}"></script>
+
+  <script src="{% static 'js/config/config.js' %}"></script>
+  <script src="{% static 'js/components/AuthorRecipe.js' %}"></script>
+  <script src="{% static 'js/components/Header.js' %}"></script>
+
+  <script src="{% static 'js/api/Api.js' %}"></script>
+  <script src="{% static 'authorRecipe.js' %}"></script>
 </body>
 </html>
