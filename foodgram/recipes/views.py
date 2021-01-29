@@ -45,8 +45,12 @@ def new_recipe(request):
 
 
 @login_required
-def recipe_edit(request, recipe_id):
-    pass
+def recipe_edit(request, username, recipe_id):
+    user = get_object_or_404(User, username=username)
+    recipe = Recipe.objects.get(pk=recipe_id)
+    if request.user != user:
+        return redirect('recipe_page', username, recipe_id)
+    return render(request, "recipe_edit.html", {})
 
 
 def profile_page(request, username):
