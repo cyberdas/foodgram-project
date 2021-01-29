@@ -34,11 +34,11 @@
         <div class="card-list">
             {% for recipe in page %}
             <div class="card" data-id="{{recipe.id}}">
-            <a href="#" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a> <!-- ссылка на рецепт?-->
+            <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a> <!-- ссылка на рецепт?-->
             <div class="card__body">
-                <a class="card__title link" href="#" target="_blank">{{recipe.title}}</a>
+                <a class="card__title link" href="{% url 'recipe_page' recipe.author.username recipe.id %}" target="_blank">{{recipe.title}}</a>
                 <ul class="card__items">
-                    {% for tag in recipe.tags.all %} <!-- лишние запросы к бд-->
+                    {% for tag in recipe.tags.all %}
                     <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
                     {% endfor %}
                 </ul>
@@ -79,6 +79,9 @@
 <script src="{% static 'js/api/Api.js' %}"></script>
     {% if user.is_authenticated %}
 <script src="{% static 'indexAuth.js' %}"></script>
+<script src="{% static 'js/components/Favorites.js' %}"></script>
+<script src="{% static 'js/components/Subscribe.js' %}"></script>
+<script src="{% static 'js/components/CardList.js' %}"></script>   
     {% else %}
 <script src="{% static 'indexNotAuth.js' %}"></script>
     {% endif %}

@@ -10,7 +10,7 @@ from django.db.models import Prefetch
 
 
 def index(request):
-    recipes = Recipe.objects.select_related("author").order_by("-pub_date").all()
+    recipes = Recipe.objects.select_related("author").prefetch_related("tags").order_by("-pub_date").all()
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -19,6 +19,7 @@ def index(request):
         "paginator": paginator
     }
     return render(request, 'index.html', context)
+
 
 @login_required
 def new_recipe(request):
@@ -43,10 +44,14 @@ def new_recipe(request):
     return render(request, 'new_recipe.html', {"form": form, "tags": tags})
 
 
+@login_required
+def recipe_edit(request, recipe_id):
+    pass
+
+
 def profile_page(request, username):
-    user = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=user).order_by("-pub_date").all()
-    # tags = recipes.tags
+    user = get_object_or_404(User, username=username) # user?
+    recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date").all()
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -54,22 +59,19 @@ def profile_page(request, username):
         "page": page,
         "paginator": paginator,
         "user": user,
-        # "tags": tags
     }
     return render(request, 'profile_page.html', context)
 
 
-def recipe_page(request, username, recipe_id):
-    tags = Tag.objects.all()
-    user = get_object_or_404(User, username=username)
-    recipes = Recipe.objects.filter(author=user).select_related("author").order_by("-pub_date").all()
-    paginator = Paginator(recipes, 6)
-    page_number = request.GET.get("page")
-    page = paginator.get_page(page_number)
+def recipe_page(request, username, recipe_id): # теги для рецепта
+    user = get_object_or_404(User, username=username) # подгрузить ингредиенты
+    recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id) # если автор поста - появляется редактировать
+    # загружать только ингредиенты нужного рецепта
+    # Follow + Favourite + add_to_chart
+    # ingredients = 
     context = {
-        "page": page,
-        "paginator": paginator,
-        "tags": tags
+        "recipe": recipe,
+        # "ingredients": ingredients
     }
         # Recipe.objects.prefetch_related.filter().order_by()
     return render(request, 'recipe_page.html', context)
