@@ -62,7 +62,13 @@
 
                     </div>
                     <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
-                    <span class="form__error"></span>
+                    {% if form.errors %}
+                    {% for error in form.non_field_errors %}
+                    <div class="form__group">
+                    <span class="form__error">{{ error|escape }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
             <div class="form__group">
@@ -74,7 +80,7 @@
                 </div>
             </div>
             <div class="form__group">
-                <label for="form.description.id_for_label" class="form__label">Описание</label>
+                <label for="{{form.description.id_for_label}}" class="form__label">Описание</label>
                 <div class="form__field-group">
                     {{ form.description|addclass:"form__textarea" }}
                     <span class="form__error">{{ form.description.errors }}</span>
@@ -85,7 +91,6 @@
                 <div class="form__field-group">
                     <!-- <label for="{{ form.image.id_for_label }}" class="form__file-button">Выбрать файл</label> -->
                     {{ form.image|addclass:"form__file-name" }}
-                    <input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}" class="form__file">
                     <!--<input type="file" name="{{ form.image.name }}" id="{{ form.image.id_for_label }}" class="form__file"> -->
                     <!-- <div id="filename"class="form__file-name"></div> -->
                     <span class="form__error">{{form.image.errors}}</span>
@@ -95,7 +100,7 @@
                 <button class="button button_style_blue">Создать рецепт</button>
             </div>
         </form>
-    </div>  
+    </div>      
 
 
 </main>

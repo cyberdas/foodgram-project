@@ -6,6 +6,4 @@ def get_ingredients(request):
             ingredients[request.POST[key]
                         ] = request.POST["valueIngredient_" + value_ingredient]
     return ingredients
-
-def get_tags(request):
-    tags = {}
+    
