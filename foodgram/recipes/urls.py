@@ -8,4 +8,5 @@ urlpatterns = [
     path("<username>", views.profile_page, name='profile_page'),
     path("<username>/<int:recipe_id>", views.recipe_page, name='recipe_page'),
     path("<username>/<int:recipe_id>/edit", views.recipe_edit, name='recipe_edit'),
+    path("<username>/<int:recipe_id>/delete", views.recipe_delete, name='recipe_delete'),
 ]

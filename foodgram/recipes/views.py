@@ -69,12 +69,20 @@ def recipe_edit(request, username, recipe_id):
                 form.save()
                 return redirect("recipe_page", username=username, recipe_id=recipe_id)
     context = {
-        "form": form, 
-        "recipe": recipe, 
-        "tags": tags, 
+        "form": form,
+        "recipe": recipe,
+        "tags": tags,
         "recipe_tags": recipe_tags,
     }
     return render(request, "recipe_edit.html", context)
+
+@login_required
+def recipe_delete(request, username, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    if request.user != recipe.author:
+        return redirect("recipe_page", username=username, recipe_id=recipe_id)
+    recipe.delete()
+    return redirect("profile_page", username=username)
 
 
 def profile_page(request, username):
