@@ -4,7 +4,7 @@
             {% url 'index' as url %}
             <li class="nav__item {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
             {% if user.is_authenticated %}
-            <li class="nav__item"><a href="#" class="nav__link link">Мои подписки</a></li>
+            <li class="nav__item"><a href="{% url 'feed' %}" class="nav__link link">Мои подписки</a></li>
             {% url 'new_recipe' as url %}
             <li class="nav__item  {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a></li>
             <li class="nav__item"><a href="#" class="nav__link link">Избранное</a></li>

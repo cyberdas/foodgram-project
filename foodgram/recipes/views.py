@@ -1,6 +1,6 @@
 from django.shortcuts import render # иморты по pep8
 from .forms import RecipeForm
-from .models import Recipe, RecipeIngredient, Tag, Ingredient, User
+from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -19,6 +19,13 @@ def index(request):
         "paginator": paginator
     }
     return render(request, 'index.html', context)
+
+@login_required
+def feed(request):
+    context = {
+
+    }
+    return render(request, "feed.html", context)
 
 
 @login_required
@@ -76,6 +83,7 @@ def recipe_edit(request, username, recipe_id):
     }
     return render(request, "recipe_edit.html", context)
 
+
 @login_required
 def recipe_delete(request, username, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
@@ -91,10 +99,12 @@ def profile_page(request, username):
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
+    following = Follow.objects.filter(user=request.user, author=user).exists()
     context = {
         "page": page,
         "paginator": paginator,
         "user": user,
+        "following": following,
     }
     return render(request, 'profile_page.html', context)
 

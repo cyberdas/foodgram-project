@@ -33,11 +33,21 @@
 
         </div>
 <!--        <p style="padding: 0 0 2em 0;"><a class="button button_style_light-blue" href="#">Подписаться на автора</a></p>-->
-        {% if user.is_authenticated %}
-        <div class="author-subscribe" data-author="323">
+        {% if request.user != user and user.is_authenticated %}
+        {% csrf_token %}
+            {% if not following %}
+        <div class="author-subscribe" data-author="{{ user.id }}">
             <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
         </div>
+            {% else %}
+        <div class="author-subscribe" data-author="{{ user.id }}">
+            <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe button_style_blue" 
+                name="subscribe">Отписаться от автора</button>
+        </div>
+            {% endif %}
         {% endif %}
+        <!--<p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe button_style_blue" 
+            name="subscribe">Отписаться от автора</button>-->
         <div class="card-list" >
             {% for recipe in page %}
         <div class="card" data-id="{{recipe.id}}">
