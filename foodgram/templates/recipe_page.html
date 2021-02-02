@@ -41,7 +41,16 @@
                 <!-- подписаться - отписаться, список покупок только для авторизованных пользователей-->
                 <ul class="single-card__items">
                     <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
-                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></li>
+                    {% if request.user != user and user.is_authenticated %}
+                    {% csrf_token %}
+                    {% if not following %}
+                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe"
+                        name="subscribe" data-out>Подписаться на автора</button></li>
+                    {% else %}
+                    <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe"
+                        name="subscribe">Отписаться от автора</button></li>
+                    {% endif %}
+                    {% endif %}
                 </ul>
                 <div class="single-card__section"> <!-- ингрендиенты -->
                     <h3 class="single-card__section-title">Ингредиенты:</h3>

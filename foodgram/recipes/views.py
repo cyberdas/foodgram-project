@@ -20,10 +20,14 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
+
 @login_required
 def feed(request):
+    following = User.objects.filter(following__user=request.user) # пользователи, на которых подписан автор
+            # рецепты этих пользователей
+    recipes = Recipe.objects.filter(author__following__user=request.user)
     context = {
-
+        "recipes": recipes
     }
     return render(request, "feed.html", context)
 
@@ -112,11 +116,14 @@ def profile_page(request, username):
 def recipe_page(request, username, recipe_id): # теги для рецепта
     user = get_object_or_404(User, username=username) # подгрузить ингредиенты
     recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id) # если автор поста - появляется редактировать
+    following = Follow.objects.filter(user=request.user, author=user).exists()
     # загружать только ингредиенты нужного рецепта
     # Follow + Favourite + add_to_chart
     # ingredients = 
     context = {
         "recipe": recipe,
+        "following": following,
+        "user": user
         # "ingredients": ingredients
     }
         # Recipe.objects.prefetch_related.filter().order_by()
