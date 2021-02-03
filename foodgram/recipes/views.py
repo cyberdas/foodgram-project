@@ -1,6 +1,6 @@
 from django.shortcuts import render # иморты по pep8
 from .forms import RecipeForm
-from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow
+from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow, Favorite
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -23,11 +23,16 @@ def index(request):
 
 @login_required
 def feed(request):
-    following = User.objects.filter(following__user=request.user) # пользователи, на которых подписан автор
-            # рецепты этих пользователей
+    following = User.objects.filter(following__user=request.user)
     recipes = Recipe.objects.filter(author__following__user=request.user)
+    paginator = Paginator(following, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     context = {
-        "recipes": recipes
+        "recipes": recipes,
+        "following": following,
+        "page": page,
+        "paginator": paginator
     }
     return render(request, "feed.html", context)
 
@@ -40,18 +45,15 @@ def new_recipe(request):
         if form.is_valid():
             new_recipe = form.save(commit=False)
             new_recipe.author = request.user
-            # new.recipe.tags.add()
             new_recipe.save()
             ingredients = get_ingredients(request)
             if not ingredients:
                 form.add_error(None, "Добавьте хотя бы один ингредиент")
-            # сохраняем каждый ингредиент в рецепт
             else:
                 objs = [RecipeIngredient(recipe=new_recipe, amount=value, ingredient=get_object_or_404(Ingredient, title=title))
                     for title, value in ingredients.items()]
                 RecipeIngredient.objects.bulk_create(objs)
                 form.save_m2m()
-            # add ingredients/tags
                 return redirect(reverse('index'))
         return render(request, 'new_recipe.html', {"form": form, "tags": tags})
     form = RecipeForm() 
@@ -104,11 +106,15 @@ def profile_page(request, username):
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     following = Follow.objects.filter(user=request.user, author=user).exists()
+    favorites = User.objects.filter(favorites__user=request.user) # recipe=в шаблоне?
+    # список рецептов, которые автор добавил в избранное
     context = {
         "page": page,
         "paginator": paginator,
         "user": user,
         "following": following,
+        "favorites": favorites,
+        # "favorite": favorite
     }
     return render(request, 'profile_page.html', context)
 
@@ -117,14 +123,18 @@ def recipe_page(request, username, recipe_id): # теги для рецепта
     user = get_object_or_404(User, username=username) # подгрузить ингредиенты
     recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id) # если автор поста - появляется редактировать
     following = Follow.objects.filter(user=request.user, author=user).exists()
-    # загружать только ингредиенты нужного рецепта
-    # Follow + Favourite + add_to_chart
-    # ingredients = 
+    favorite = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
     context = {
         "recipe": recipe,
         "following": following,
-        "user": user
-        # "ingredients": ingredients
+        "user": user,
+        "favorite": favorite,
     }
-        # Recipe.objects.prefetch_related.filter().order_by()
     return render(request, 'recipe_page.html', context)
+
+
+@login_required
+def favorites(request):
+    context = {
+    }
+    return render(request, "favorite.html", context)

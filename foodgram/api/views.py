@@ -3,7 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from recipes.models import Ingredient, RecipeIngredient, User
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
-from recipes.models import Follow, User
+from recipes.models import Follow, User, Favorite, Recipe
 import json
 
 
@@ -16,7 +16,6 @@ def get_ingredients(request):
 
 @require_http_methods(["POST"])
 def add_subscription(request):
-    test = json.loads(request.body)
     id = int(json.loads(request.body)["id"])
     user = request.user
     if user.id != id:
@@ -29,4 +28,19 @@ def add_subscription(request):
 @require_http_methods(["DELETE"])
 def remove_subscription(request, id):
     deleted = Follow.objects.filter(user=request.user, author_id=id).delete()
+    return JsonResponse({"success": True})
+
+
+@require_http_methods(["POST"])
+def add_favorite(request): #Добавляем в избранное рецепт
+    id = int(json.loads(request.body)["id"])
+    user = request.user
+    Favorite.objects.get_or_create(user=user, recipe=Recipe.objects.get(pk=id))
+    return JsonResponse({"success": True})
+
+
+@require_http_methods(["DELETE"])
+def remove_favorite(request, id):
+    user = request.user
+    deleted = Favorite.objects.filter(user=user, recipe_id=id).delete()
     return JsonResponse({"success": True})

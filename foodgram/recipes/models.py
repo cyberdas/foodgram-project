@@ -21,7 +21,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author_recipes')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author_recipes') # все рецепты автора
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='recipes/')
     description = models.TextField()
@@ -33,6 +33,9 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta: # для шаблона
+        ordering = ["-pub_date"]
 
 
 class RecipeIngredient(models.Model):
@@ -47,3 +50,7 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ("user", "author",)
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorites")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
