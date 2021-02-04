@@ -67,7 +67,7 @@
             <div class="card__footer">
                 <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
                 {% if user.is_authenticated %}
-                {% if recipe in favorites.author_recipes.all %} <!--не работает recipe.objects.filter(author__favorites__user=request.user)проверка-->
+                {% if recipe in favorites %} <!--не работает recipe.objects.filter(author__favorites__user=request.user)проверка-->
                     <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_big icon-favorite_active"></span></button>
                 {% else %}
                     <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite icon-favorite_big"></span></button>
@@ -77,19 +77,8 @@
         </div>
         {% endfor %}
         </div>
-        <nav class="pagination" aria-label="Search results pages">
-            <ul class="pagination__container">
-                <li class="pagination__item"><a class="pagination__link link" href="#"><span class="icon-left"></span></a></li>
-                <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="#">1</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">2</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">3</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">4</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">5</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#"><span class="icon-right"></span></a></li>
-            </ul>
-        </nav>
         {% if page.has_other_pages %}
-            {% include 'paginator.html' %}   
+            {% include 'paginator.html' with items=page paginator=paginator %}   
         {% endif %}
     </main>
     <footer class="footer">

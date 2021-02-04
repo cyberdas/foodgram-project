@@ -47,6 +47,7 @@
                     <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile_page' recipe.author.username %}" style="color: black">{{ recipe.author }}</a></p> <!-- ссылка на страницу автора -->
                 </div>
                 <div class="card__footer">
+                    {% csrf_token %}
                     <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
                 </div>
             </div>
@@ -61,18 +62,17 @@
 <script src="{% static 'js/components/MainCards.js' %}"></script>
 
 <script src="{% static 'js/components/Purchases.js' %}"></script>
+<script src="{% static 'js/components/Favorites.js' %}"></script>
     
 <script src="{% static 'js/config/config.js' %}"></script>
 <script src="{% static 'js/components/CardList.js' %}"></script>
 <script src="{% static 'js/components/Header.js' %}"></script>
+    
 <script src="{% static 'js/api/Api.js' %}"></script>
-    {% if user.is_authenticated %}
-<script src="{% static 'indexAuth.js' %}"></script>
-<script src="{% static 'js/components/Favorites.js' %}"></script>
-<script src="{% static 'js/components/Subscribe.js' %}"></script>
-<script src="{% static 'js/components/CardList.js' %}"></script>   
-    {% else %}
-<script src="{% static 'indexNotAuth.js' %}"></script>
-    {% endif %}
+{% if user.is_authenticated %}
+    <script src="{% static 'indexAuth.js' %}"></script>
+{% else %}
+    <script src="{% static 'indexNotAuth.js' %}"></script>
+{% endif %}
 </body>
 </html>

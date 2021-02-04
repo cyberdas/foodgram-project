@@ -33,85 +33,34 @@
 
         </div>
         <div class="card-list">
-            <div class="card" data-id="123">
-                <a href="#" class="link" target="_blank"><img src="./images/testCardImg.png" alt="Какой-то текст" class="card__image"></a>
+            {% for recipe in page %}
+            <div class="card" data-id="{{recipe.id}}">
+                <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a>
                 <div class="card__body">
-                    <a class="card__title link" href="#" target="_blank">Французские тосты</a>
+                    <a class="card__title link" href="#" target="_blank">{{recipe.title}}</a>
                     <ul class="card__items">
-                        <li class="card__item"><span class="badge badge_style_green">Обед</span></li>
-                        <li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>
-                        <li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>
+                        {% for tag in recipe.tags.all %}
+                        <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
+                        {% endfor %}
                     </ul>
                     <div class="card__items card__items_column">
-                        <p class="card__text"><span class="icon-time"></span> 20 мин.</p>
-                        <p class="card__text"><span class="icon-user"></span> Вероника Чернова</p>
+                        <p class="card__text"><span class="icon-time"></span>  {{recipe.cooking_time}} мин.</p>
+                        <p class="card__text"><span class="icon-user"></span><a href="{% url 'profile_page' recipe.author.username %}" style="color: black">{{recipe.author}}</a> </p>
                     </div>
                 </div>
                 <div class="card__footer">
+                    {% csrf_token %}
                     <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                    <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
+                    <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_active"></span></button>
                 </div>
             </div>
-            <div class="card" data-id="1241">
-                <a href="#" class="link" target="_blank"><img src="./images/testCardImg.png" alt="Какой-то текст" class="card__image"></a>
-                <div class="card__body">
-                    <a class="card__title link" href="#" target="_blank">Французские тосты</a>
-                    <ul class="card__items">
-                        <li class="card__item"><span class="badge badge_style_green">Обед</span></li>
-                        <li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>
-                        <li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>
-                    </ul>
-                    <div class="card__items card__items_column">
-                        <p class="card__text"><span class="icon-time"></span> 20 мин.</p>
-                        <p class="card__text"><span class="icon-user"></span> Вероника Чернова</p>
-                    </div>
-                </div>
-                <div class="card__footer">
-                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                    <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
-                </div>
-            </div>
-            <div class="card" data-id="1124">
-                <a href="#" class="link" target="_blank"><img src="./images/testCardImg.png" alt="Какой-то текст" class="card__image"></a>
-                <div class="card__body">
-                    <a class="card__title link" href="#" target="_blank">Французские тосты</a>
-                    <ul class="card__items">
-                        <li class="card__item"><span class="badge badge_style_green">Обед</span></li>
-                        <li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>
-                        <li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>
-                    </ul>
-                    <div class="card__items card__items_column">
-                        <p class="card__text"><span class="icon-time"></span> 20 мин.</p>
-                        <p class="card__text"><span class="icon-user"></span> Вероника Чернова</p>
-                    </div>
-                </div>
-                <div class="card__footer">
-                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                    <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-        <nav class="pagination" aria-label="Search results pages">
-            <ul class="pagination__container">
-                <li class="pagination__item"><a class="pagination__link link" href="#"><span class="icon-left"></span></a></li>
-                <li class="pagination__item pagination__item_active"><a class="pagination__link link" href="#">1</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">2</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">3</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">4</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#">5</a></li>
-                <li class="pagination__item"><a class="pagination__link link" href="#"><span class="icon-right"></span></a></li>
-            </ul>
-        </nav>
+        {% if page.has_other_pages %}
+            {% include "paginator.html" with items=page paginator=paginator %}
+        {% endif %}
     </main>
-    <footer class="footer">
-        <div class="footer__container container">
-            <a href="#" class="footer__brand link">Продуктовый помощник</a>
-            <ul class="footer__items">
-                <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
-                <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
-            </ul>
-        </div>
-    </footer>
+    {% include 'footer.html' %}
 <script src="{% static 'js/components/MainCards.js' %}"></script>
 <script src="{% static 'js/components/Purchases.js' %}"></script>
 <script src="{% static 'js/components/Favorites.js' %}"></script>
@@ -120,6 +69,6 @@
 <script src="{% static 'js/components/Header.js' %}"></script>
 
 <script src="{% static 'js/api/Api.js' %}"></script>
-<script src="{% static 'authorRecipe.js' %}"></script>
+<script src="{% static 'favorite.js' %}"></script>
 </body>
 </html>

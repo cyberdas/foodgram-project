@@ -1,6 +1,6 @@
 from django.shortcuts import render # иморты по pep8
 from .forms import RecipeForm
-from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow, Favorite
+from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow, Favorite, WishList
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -23,7 +23,7 @@ def index(request):
 
 @login_required
 def feed(request):
-    following = User.objects.filter(following__user=request.user)
+    following = User.objects.filter(following__user=request.user).order_by("id")
     recipes = Recipe.objects.filter(author__following__user=request.user)
     paginator = Paginator(following, 6)
     page_number = request.GET.get('page')
@@ -106,7 +106,7 @@ def profile_page(request, username):
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     following = Follow.objects.filter(user=request.user, author=user).exists()
-    favorites = User.objects.filter(favorites__user=request.user) # recipe=в шаблоне?
+    favorites = Recipe.objects.filter(favorite_recipe__user=request.user) # recipe=в шаблоне?
     # список рецептов, которые автор добавил в избранное
     context = {
         "page": page,
@@ -135,6 +135,19 @@ def recipe_page(request, username, recipe_id): # теги для рецепта
 
 @login_required
 def favorites(request):
+    user = request.user
+    recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags").all()
+    paginator = Paginator(recipes, 6)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
     context = {
+        "page": page,
+        "paginator": paginator,
     }
     return render(request, "favorite.html", context)
+
+
+def get_purchases(request):
+    context = {
+    }
+    return render(request, "shopList.html", context)
