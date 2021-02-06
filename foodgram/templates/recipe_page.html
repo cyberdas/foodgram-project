@@ -20,7 +20,7 @@
                 <div class="single-card__header-info">
                     <h1 class="single-card__title">{{recipe.title}}</h1>
                     <div class="single-card__favorite">
-                        {% if user.is_authenticated %}
+                        {% if request.user.is_authenticated %}
                         {% if favorite %}
                         <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_big icon-favorite_active"></span></button>
                         <div class="single-card__favorite-tooltip tooltip">Убрать из избранного</div>
@@ -47,8 +47,12 @@
                 </div>
                 <!-- подписаться - отписаться, список покупок только для авторизованных пользователей-->
                 <ul class="single-card__items">
+                    {% if wishlist %}
+                    <li class="single-card__item"><button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button></li>
+                    {% else %}
                     <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
-                    {% if request.user != user and user.is_authenticated %}
+                    {% endif %}
+                    {% if request.user != user and request.user.is_authenticated %}
                     {% csrf_token %}
                     {% if not following %}
                     <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe"

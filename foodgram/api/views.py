@@ -61,3 +61,9 @@ def delete_purchases(request, id):
     recipe = get_object_or_404(Recipe, pk=id)
     WishList.objects.filter(user=user, recipe=recipe).delete()
     return JsonResponse({"success": True})
+
+def get_wishlist(request): # возвращать ингрдиенты всех рецептов из списка покупок
+    ingredients = ["1", "2", "3"]
+    response = HttpResponse(ingredients, content_type="text/plain")
+    response['Content-Disposition'] = 'attachment; filename="foo.txt"'
+    return response

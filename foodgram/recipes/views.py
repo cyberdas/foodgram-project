@@ -16,8 +16,11 @@ def index(request):
     page = paginator.get_page(page_number)
     context = {
         "page": page,
-        "paginator": paginator
+        "paginator": paginator,
     }
+    if request.user.is_authenticated:
+        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
+        context["wishlist"] = wishlist
     return render(request, 'index.html', context)
 
 
@@ -32,7 +35,7 @@ def feed(request):
         "recipes": recipes,
         "following": following,
         "page": page,
-        "paginator": paginator
+        "paginator": paginator,
     }
     return render(request, "feed.html", context)
 
@@ -101,53 +104,75 @@ def recipe_delete(request, username, recipe_id):
 
 def profile_page(request, username):
     user = get_object_or_404(User, username=username) # user?
-    recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date").all()
+    recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date")
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    following = Follow.objects.filter(user=request.user, author=user).exists()
-    favorites = Recipe.objects.filter(favorite_recipe__user=request.user) # recipe=в шаблоне?
-    # список рецептов, которые автор добавил в избранное
     context = {
         "page": page,
         "paginator": paginator,
         "user": user,
-        "following": following,
-        "favorites": favorites,
-        # "favorite": favorite
     }
+    if request.user.is_authenticated:
+        following = Follow.objects.filter(user=request.user, author=user).exists()
+        favorites = Recipe.objects.filter(favorite_recipe__user=request.user) # recipe=в шаблоне?
+        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)  
+        context["following"] = following
+        context["favorites"] = favorites
+        context["wishlist"] = wishlist
     return render(request, 'profile_page.html', context)
 
 
 def recipe_page(request, username, recipe_id): # теги для рецепта
     user = get_object_or_404(User, username=username) # подгрузить ингредиенты
     recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id) # если автор поста - появляется редактировать
-    following = Follow.objects.filter(user=request.user, author=user).exists()
-    favorite = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
     context = {
         "recipe": recipe,
-        "following": following,
         "user": user,
-        "favorite": favorite,
     }
+    if request.user.is_authenticated:
+        following = Follow.objects.filter(user=request.user, author=user).exists()
+        favorite = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+        wishlist = WishList.objects.filter(user=request.user, recipe=recipe).exists()
+        context["following"] = following
+        context["favorite"] = favorite
+        context["wishlist"] = wishlist
     return render(request, 'recipe_page.html', context)
 
 
 @login_required
 def favorites(request):
     user = request.user
-    recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags").all()
+    recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags")
+    wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     context = {
         "page": page,
         "paginator": paginator,
+        "wishlist": wishlist,
     }
     return render(request, "favorite.html", context)
 
 
 def get_purchases(request):
+    # рецепты, которые добавили в список покупок
+    recipes = Recipe.objects.filter(wishlist_recipe__user=request.user, )
     context = {
+        "recipes": recipes
     }
     return render(request, "shopList.html", context)
+
+
+def page_not_found(request, exception):
+    return render(
+        request, 
+        "misc/404.html", 
+        {"path": request.path}, 
+        status=404
+    )
+
+
+def server_error(request):
+    return render(request, "misc/500.html", status=500)

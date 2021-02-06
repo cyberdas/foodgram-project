@@ -25,15 +25,18 @@ SECRET_KEY = 's*-xwgemy*c0dh_4!c8q+hxluc4$@g=*nt!i2fchr1*x4$wws7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
+SITE_ID = 2
 
 INSTALLED_APPS = [
     'recipes',
     'users',
     'foodgram',
+    "django.contrib.sites",
+    "django.contrib.flatpages",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -54,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 ]
 
 INTERNAL_IPS = [
