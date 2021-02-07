@@ -45,15 +45,15 @@
                         {% endif %}
                     </ul>
                 </div>
-                <!-- подписаться - отписаться, список покупок только для авторизованных пользователей-->
                 <ul class="single-card__items">
+                    {% csrf_token %}
+                    {% if request.user.is_authenticated %}
                     {% if wishlist %}
                     <li class="single-card__item"><button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button></li>
                     {% else %}
                     <li class="single-card__item"><button class="button button_style_blue" name="purchases" data-out><span class="icon-plus"></span> Добавить в покупки</button></li>
                     {% endif %}
-                    {% if request.user != user and request.user.is_authenticated %}
-                    {% csrf_token %}
+                    {% if request.user != user %}
                     {% if not following %}
                     <li class="single-card__item"><button class="button button_style_light-blue button_size_subscribe"
                         name="subscribe" data-out>Подписаться на автора</button></li>
@@ -62,8 +62,9 @@
                         name="subscribe">Отписаться от автора</button></li>
                     {% endif %}
                     {% endif %}
+                    {% endif %}
                 </ul>
-                <div class="single-card__section"> <!-- ингрендиенты -->
+                <div class="single-card__section">
                     <h3 class="single-card__section-title">Ингредиенты:</h3>
                     <div class="single-card__items single-card__items_column">
                         {% for ingredient in recipe.recipe_ingredients.all %}

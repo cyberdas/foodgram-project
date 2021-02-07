@@ -10,9 +10,10 @@
             <li class="nav__item  {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a></li>
             {% url 'favorites' as url %}
             <li class="nav__item {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'favorites'%}" class="nav__link link">Избранное</a></li>
-            {% endif %}
             {% url 'get_purchases' as url %}
-            <li class="nav__item  {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'get_purchases' %}" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">4</span></a></li>
+            {% load wishlist_count%}
+            <li class="nav__item  {% if request.path == url %} nav__item_active {% endif %}"><a href="{% url 'get_purchases' %}" class="nav__link link">Список покупок <span class="badge badge_style_blue nav__badge" id="counter">{{request.user|wishlist_count}}</span></a></li>
+            {% endif %}
         </ul>
         <ul class="nav__items list">
             {% if request.user.is_authenticated %}

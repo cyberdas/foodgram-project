@@ -26,7 +26,7 @@ def index(request):
 
 @login_required
 def feed(request):
-    following = User.objects.filter(following__user=request.user).order_by("id")
+    following = User.objects.filter(following__user=request.user).prefetch_related("author_recipes").order_by("id")
     recipes = Recipe.objects.filter(author__following__user=request.user)
     paginator = Paginator(following, 6)
     page_number = request.GET.get('page')
@@ -144,7 +144,7 @@ def recipe_page(request, username, recipe_id): # теги для рецепта
 def favorites(request):
     user = request.user
     recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags")
-    wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
+    wishlist = Recipe.objects.filter(wishlist_recipe__user=user)
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -155,7 +155,7 @@ def favorites(request):
     }
     return render(request, "favorite.html", context)
 
-
+@login_required
 def get_purchases(request):
     # рецепты, которые добавили в список покупок
     recipes = Recipe.objects.filter(wishlist_recipe__user=request.user, )

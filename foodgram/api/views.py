@@ -3,7 +3,8 @@ from django.http import JsonResponse, HttpResponse
 from recipes.models import Ingredient, RecipeIngredient, User
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
-from recipes.models import Follow, User, Favorite, Recipe, WishList
+from django.contrib.auth.decorators import login_required
+from recipes.models import Follow, User, Favorite, Recipe, WishList, RecipeIngredient, Ingredient
 import json
 
 
@@ -55,6 +56,7 @@ def add_purchases(request):
     WishList.objects.get_or_create(user=user, recipe_id=recipe_id)
     return JsonResponse({"sucess": True})
 
+
 @require_http_methods(["DELETE"])
 def delete_purchases(request, id):
     user = request.user
@@ -62,8 +64,20 @@ def delete_purchases(request, id):
     WishList.objects.filter(user=user, recipe=recipe).delete()
     return JsonResponse({"success": True})
 
-def get_wishlist(request): # возвращать ингрдиенты всех рецептов из списка покупок
-    ingredients = ["1", "2", "3"]
-    response = HttpResponse(ingredients, content_type="text/plain")
-    response['Content-Disposition'] = 'attachment; filename="foo.txt"'
+@login_required
+def get_wishlist(request):
+    user = request.user
+    recipes = Recipe.objects.filter(wishlist_recipe__user=user)
+    ingredients = {}
+    ingredients_filter = RecipeIngredient.objects.filter(recipe_id__in=recipes)
+    for ingredient in ingredients_filter:
+        if ingredient.ingredient in ingredients.keys():
+            ingredients[ingredient.ingredient] += ingredient.amount
+        else:
+            ingredients[ingredient.ingredient] = ingredient.amount
+    ingredients_response = []
+    for k, v in ingredients.items():
+        ingredients_response.append(f"{k.title} ({k.dimension}) — {v} \n")
+    response = HttpResponse(ingredients_response, content_type="text/plain")
+    response['Content-Disposition'] = 'attachment; filename="ingrediens.txt"'
     return response
