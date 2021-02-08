@@ -10,13 +10,19 @@ from django.db.models import Prefetch
 
 
 def index(request):
-    recipes = Recipe.objects.select_related("author").prefetch_related("tags").order_by("-pub_date").all()
+    tags_all = Tag.objects.all()
+    if request.GET.get("filters"): # есть ли в запросе теги, неправильно работает с page
+        tags = request.GET.getlist("filters")
+        recipes = Recipe.objects.filter(tags__slug__in=tags).select_related("author").prefetch_related("tags").order_by("-pub_date")
+    else:
+        recipes = Recipe.objects.select_related("author").prefetch_related("tags").order_by("-pub_date").all()
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
         "page": page,
         "paginator": paginator,
+        "tags": tags_all
     }
     if request.user.is_authenticated:
         wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
