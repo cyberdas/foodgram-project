@@ -11,21 +11,23 @@ from django.db.models import Prefetch
 
 def index(request):
     tags_all = Tag.objects.all()
-    if request.GET.get("filters"): # есть ли в запросе теги, неправильно работает с page
-        tags = request.GET.getlist("filters")
-        recipes = Recipe.objects.filter(tags__slug__in=tags).select_related("author").prefetch_related("tags").order_by("-pub_date")
+    tag_filters = request.GET.getlist("filters")
+    if tag_filters:
+        # tag_filters = Tag.objects.filter(slug__in=tag_values)
+        recipes = Recipe.objects.filter(tags__slug__in=tag_filters).select_related("author").prefetch_related("tags").distinct()
     else:
-        recipes = Recipe.objects.select_related("author").prefetch_related("tags").order_by("-pub_date").all()
+        recipes = Recipe.objects.select_related("author").prefetch_related("tags").all()
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
         "page": page,
         "paginator": paginator,
-        "tags": tags_all
+        "tags_all": tags_all,
+        "tag_filters": tag_filters
     }
     if request.user.is_authenticated:
-        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
+        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user).select_related("wishlist_recipe")
         context["wishlist"] = wishlist
     return render(request, 'index.html', context)
 

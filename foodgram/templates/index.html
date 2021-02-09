@@ -1,4 +1,5 @@
 {% load static %}
+{% load filter_url %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -17,9 +18,16 @@
         <div class="main__header">
             <h1 class="main__title">Рецепты</h1>
             <ul class="tags">
-                {% for tag in tags %}
+                {% for tag in tags_all %}
                 <li class="tags__item">
-                    <a id="{{tag.slug}}" class="tags__checkbox tags__checkbox_style_{{tag.color}} tags__checkbox_active" href="/?filters={{tag.slug}}"></a>
+                    <a id="{{tag.slug}}" class="tags__checkbox 
+                    tags__checkbox_style_{{tag.color}} 
+                    {% if tag.slug in tag_filters %}
+                    tags__checkbox_active
+                    {% else %}
+                    tags__checkbox
+                    {% endif %}"
+                    href="{% url 'index' %}?{% filter_url request filters=tag.slug %}"></a> <!-- текущий url + новый фильтр /?filters={{tag.slug}} -->
                     <span class="tags__label">{{tag.name}}</span>
                 </li>
                 {% endfor %}
