@@ -1,5 +1,5 @@
 {% load static %}
-{% load filter_url %}
+{% load tags_url %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -27,7 +27,7 @@
                     {% else %}
                     tags__checkbox
                     {% endif %}"
-                    href="{% url 'index' %}?{% filter_url request filters=tag.slug %}"></a> <!-- текущий url + новый фильтр /?filters={{tag.slug}} -->
+                    href="{% url 'index' %}?{{request|new_filter_link:tag.slug}}"></a> <!-- текущий url + новый фильтр /?filters={{tag.slug}} -->
                     <span class="tags__label">{{tag.name}}</span>
                 </li>
                 {% endfor %}

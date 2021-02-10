@@ -5,13 +5,15 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.shortcuts import redirect, get_object_or_404
-from .utils import get_ingredients
+from .utils import get_ingredients, deactivate_tag
 from django.db.models import Prefetch
 
 
 def index(request):
     tags_all = Tag.objects.all()
-    tag_filters = request.GET.getlist("filters")
+    tag_filters = request.GET.getlist("filters") # возращает [breakfast, lunch и пр.]
+    # если есть повтор в filters - удалить его из url
+    # if deactivate_tag()
     if tag_filters:
         # tag_filters = Tag.objects.filter(slug__in=tag_values)
         recipes = Recipe.objects.filter(tags__slug__in=tag_filters).select_related("author").prefetch_related("tags").distinct()
