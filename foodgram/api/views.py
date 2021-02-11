@@ -1,18 +1,16 @@
-from django.shortcuts import render
+import json
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
-from recipes.models import Ingredient, RecipeIngredient, User
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import get_object_or_404
-from django.contrib.auth.decorators import login_required
-from recipes.models import Follow, User, Favorite, Recipe, WishList, RecipeIngredient, Ingredient
-import json
+from recipes.models import Follow, Favorite, Recipe, WishList, Ingredient, RecipeIngredient, User
 
 
 # Create your views here.
 @require_http_methods(["GET"])
 def get_ingredients(request):
     query = request.GET.get('query')
-    ingredients = Ingredient.objects.filter(title__contains=query).values('title','dimension')
+    ingredients = Ingredient.objects.filter(title__contains=query).values('title', 'dimension')
     return JsonResponse(list(ingredients), safe=False)
 
 
@@ -29,12 +27,12 @@ def add_subscription(request):
 
 @require_http_methods(["DELETE"])
 def remove_subscription(request, id):
-    deleted = Follow.objects.filter(user=request.user, author_id=id).delete()
+    Follow.objects.filter(user=request.user, author_id=id).delete()
     return JsonResponse({"success": True})
 
 
 @require_http_methods(["POST"])
-def add_favorite(request): #Добавляем в избранное рецепт
+def add_favorite(request):
     id = int(json.loads(request.body)["id"])
     user = request.user
     Favorite.objects.get_or_create(user=user, recipe=Recipe.objects.get(pk=id))
@@ -44,7 +42,7 @@ def add_favorite(request): #Добавляем в избранное рецеп�
 @require_http_methods(["DELETE"])
 def remove_favorite(request, id):
     user = request.user
-    deleted = Favorite.objects.filter(user=user, recipe_id=id).delete()
+    Favorite.objects.filter(user=user, recipe_id=id).delete()
     return JsonResponse({"success": True})
 
 

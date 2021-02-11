@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Recipe, Ingredient, RecipeIngredient, Tag, Follow, Favorite, WishList
+from .models import (Recipe, Ingredient, RecipeIngredient, Tag, Follow,
+                     Favorite, WishList)
+
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ("pk", "title", "dimension", "recipes") 
+    list_display = ("pk", "title", "dimension", "recipes")
     empty_value_display = '-пусто-'
 
 

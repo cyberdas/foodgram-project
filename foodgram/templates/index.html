@@ -18,7 +18,7 @@
         <div class="main__header">
             <h1 class="main__title">Рецепты</h1>
             <ul class="tags">
-                {% for tag in tags_all %}
+                {% for tag in all_tags %}
                 <li class="tags__item">
                     <a id="{{tag.slug}}" class="tags__checkbox 
                     tags__checkbox_style_{{tag.color}} 
@@ -27,7 +27,7 @@
                     {% else %}
                     tags__checkbox
                     {% endif %}"
-                    href="{% url 'index' %}?{{request|new_filter_link:tag.slug}}"></a> <!-- текущий url + новый фильтр /?filters={{tag.slug}} -->
+                    href="{% url 'index' %}?{{request|new_filter_link:tag.slug}}"></a>
                     <span class="tags__label">{{tag.name}}</span>
                 </li>
                 {% endfor %}

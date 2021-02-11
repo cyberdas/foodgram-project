@@ -1,21 +1,16 @@
-from django.shortcuts import render # иморты по pep8
-from .forms import RecipeForm
-from .models import Recipe, RecipeIngredient, Tag, Ingredient, User, Follow, Favorite, WishList
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, get_object_or_404
-from .utils import get_ingredients, deactivate_tag
-from django.db.models import Prefetch
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import RecipeForm
+from .models import (Recipe, RecipeIngredient, Tag, Ingredient,
+                     User, Follow, Favorite, WishList)
+from .utils import get_ingredients
 
 
 def index(request):
-    tags_all = Tag.objects.all()
-    tag_filters = request.GET.getlist("filters") # возращает [breakfast, lunch и пр.]
-    # если есть повтор в filters - удалить его из url
-    # if deactivate_tag()
+    tag_filters = request.GET.getlist("filters")
     if tag_filters:
-        # tag_filters = Tag.objects.filter(slug__in=tag_values)
         recipes = Recipe.objects.filter(tags__slug__in=tag_filters).select_related("author").prefetch_related("tags").distinct()
     else:
         recipes = Recipe.objects.select_related("author").prefetch_related("tags").all()
@@ -25,7 +20,6 @@ def index(request):
     context = {
         "page": page,
         "paginator": paginator,
-        "tags_all": tags_all,
         "tag_filters": tag_filters
     }
     if request.user.is_authenticated:
@@ -52,7 +46,7 @@ def feed(request):
 
 @login_required
 def new_recipe(request):
-    tags = Tag.objects.all() 
+    tags = Tag.objects.all()
     if request.method == "POST":
         form = RecipeForm(request.POST, files=request.FILES)
         if form.is_valid():
@@ -63,17 +57,18 @@ def new_recipe(request):
             if not ingredients:
                 form.add_error(None, "Добавьте хотя бы один ингредиент")
             else:
-                objs = [RecipeIngredient(recipe=new_recipe, amount=value, ingredient=get_object_or_404(Ingredient, title=title))
-                    for title, value in ingredients.items()]
+                objs = [RecipeIngredient(recipe=new_recipe, amount=value,
+                        ingredient=get_object_or_404(Ingredient, title=title))
+                        for title, value in ingredients.items()]
                 RecipeIngredient.objects.bulk_create(objs)
                 form.save_m2m()
                 return redirect(reverse('index'))
         return render(request, 'new_recipe.html', {"form": form, "tags": tags})
-    form = RecipeForm() 
+    form = RecipeForm()
     return render(request, 'new_recipe.html', {"form": form, "tags": tags})
 
 
-@login_required # сначала без select_related и prefetch_related
+@login_required
 def recipe_edit(request, username, recipe_id):
     user = get_object_or_404(User, username=username)
     recipe = get_object_or_404(Recipe.objects.prefetch_related("tags"), pk=recipe_id)
@@ -89,8 +84,9 @@ def recipe_edit(request, username, recipe_id):
                 form.add_error(None, "Добавьте хотя бы один ингредиент")
             else:
                 RecipeIngredient.objects.filter(recipe_id=recipe.id).delete()
-                objs = [RecipeIngredient(recipe=recipe, amount=value, ingredient=get_object_or_404(Ingredient, title=title))
-                    for title, value in ingredients.items()]
+                objs = [RecipeIngredient(recipe=recipe, amount=value,
+                        ingredient=get_object_or_404(Ingredient, title=title))
+                        for title, value in ingredients.items()]
                 RecipeIngredient.objects.bulk_create(objs)
                 form.save()
                 return redirect("recipe_page", username=username, recipe_id=recipe_id)
@@ -113,8 +109,12 @@ def recipe_delete(request, username, recipe_id):
 
 
 def profile_page(request, username):
-    user = get_object_or_404(User, username=username) # user?
-    recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date")
+    user = get_object_or_404(User, username=username)
+    tag_filters = request.GET.getlist("filters")
+    if tag_filters:
+        recipes = Recipe.objects.filter(author=user, tags__slug__in=tag_filters).distinct()
+    else:
+        recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date")
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -122,20 +122,21 @@ def profile_page(request, username):
         "page": page,
         "paginator": paginator,
         "user": user,
+        "tag_filters": tag_filters,
     }
     if request.user.is_authenticated:
         following = Follow.objects.filter(user=request.user, author=user).exists()
-        favorites = Recipe.objects.filter(favorite_recipe__user=request.user) # recipe=в шаблоне?
-        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)  
+        favorites = Recipe.objects.filter(favorite_recipe__user=request.user)
+        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
         context["following"] = following
         context["favorites"] = favorites
         context["wishlist"] = wishlist
     return render(request, 'profile_page.html', context)
 
 
-def recipe_page(request, username, recipe_id): # теги для рецепта
-    user = get_object_or_404(User, username=username) # подгрузить ингредиенты
-    recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id) # если автор поста - появляется редактировать
+def recipe_page(request, username, recipe_id):
+    user = get_object_or_404(User, username=username)
+    recipe = get_object_or_404(Recipe.objects.select_related("author").prefetch_related("recipe_ingredients"), pk=recipe_id)
     context = {
         "recipe": recipe,
         "user": user,
@@ -153,7 +154,11 @@ def recipe_page(request, username, recipe_id): # теги для рецепта
 @login_required
 def favorites(request):
     user = request.user
-    recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags")
+    tag_filters = request.GET.getlist("filters")
+    if tag_filters:
+        recipes = Recipe.objects.filter(favorite_recipe__user=user, tags__slug__in=tag_filters).select_related("author").prefetch_related("tags").distinct()  # custom filter?, рецепты дублируются
+    else:
+        recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags")
     wishlist = Recipe.objects.filter(wishlist_recipe__user=user)
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
@@ -162,8 +167,10 @@ def favorites(request):
         "page": page,
         "paginator": paginator,
         "wishlist": wishlist,
+        "tag_filters": tag_filters,
     }
     return render(request, "favorite.html", context)
+
 
 @login_required
 def get_purchases(request):
@@ -177,9 +184,9 @@ def get_purchases(request):
 
 def page_not_found(request, exception):
     return render(
-        request, 
-        "misc/404.html", 
-        {"path": request.path}, 
+        request,
+        "misc/404.html",
+        {"path": request.path},
         status=404
     )
 

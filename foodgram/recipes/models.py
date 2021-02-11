@@ -3,17 +3,18 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class Ingredient(models.Model):
     title = models.CharField(max_length=200)
     dimension = models.CharField(max_length=300)
 
     def __str__(self):
-        return self.title 
+        return self.title
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=10)
-    slug = models.SlugField(unique=True, max_length=100, blank=True, null=True) # value
+    slug = models.SlugField(unique=True, max_length=100, blank=True, null=True)
     color = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
@@ -21,11 +22,11 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author_recipes') # все рецепты автора
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author_recipes')
     title = models.CharField(max_length=200)
     image = models.ImageField(upload_to='recipes/')
     description = models.TextField()
-    ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient') # рецепты, для которых нужен ингредиент
+    ingredients = models.ManyToManyField(Ingredient, related_name='recipes', through='RecipeIngredient')
     tags = models.ManyToManyField(Tag, related_name='tag_recipe')
     cooking_time = models.IntegerField()
     slug = models.SlugField(unique=True, blank=True, null=True)
@@ -34,12 +35,12 @@ class Recipe(models.Model):
     def __str__(self):
         return self.title
 
-    class Meta: # для шаблона
+    class Meta:
         ordering = ["-pub_date"]
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients') # все ингредиенты рецепта
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients')
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     amount = models.PositiveSmallIntegerField()
 

@@ -20,9 +20,9 @@
     </div>
     <div class="card-list">
         {% for author in page %}
-        <div class="card-user" data-author="{{author.id}}">
+        <div class="card-user" data-author="{{ author.id }}">
             <div class="card-user__header">
-                <h2 class="card-user__title">{{author.username}}</h2>
+                <h2 class="card-user__title">{{ author.username }}</h2>
             </div>
             <div class="card-user__body">
                 {% if author.author_recipes.all.count > 3 %}
@@ -30,7 +30,7 @@
                 <ul class="card-user__items">
                     <li class="card-user__item">
                         <div class="recipe">
-                            <img src="{{recipe.image.url}}" alt="{{recipe.title}}" class="recipe__image">
+                            <img src="{{recipe.image.url}}" alt="{{ recipe.title }}" class="recipe__image">
                             <h3 class="recipe__title">{{recipe.title}}</h3>
                             <p class="recipe__text"><span class="icon-time"></span> {{recipe.cooking_time}} мин.</p>
                         </div>

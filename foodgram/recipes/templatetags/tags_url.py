@@ -1,14 +1,7 @@
 from django import template
-from recipes.models import WishList
 
 register = template.Library()
 
-
-# @register.simple_tag
-# def filter_url(request, *args, **kwargs):
-    #updated = request.GET.copy()
-    #updated.update(kwargs)
-    #return updated.urlencode()
 
 @register.filter
 def new_filter_link(request, tag):
@@ -17,7 +10,7 @@ def new_filter_link(request, tag):
     if tag in request.GET.getlist("filters"):
         filters = request.GET.getlist("filters")
         filters.remove(tag)
-        new_request.setlist("filters", filters)  # задает значение ключа
+        new_request.setlist("filters", filters)
     else:
-        new_request.appendlist("filters", tag) # добавление значения в ключ filters
+        new_request.appendlist("filters", tag)
     return new_request.urlencode()
