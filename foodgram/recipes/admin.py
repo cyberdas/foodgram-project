@@ -1,11 +1,21 @@
 from django.contrib import admin
-from .models import (Recipe, Ingredient, RecipeIngredient, Tag, Follow,
-                     Favorite, WishList)
+from django.contrib.auth.admin import UserAdmin
+from .models import (User, Recipe, Ingredient, RecipeIngredient, Tag,
+                     Follow, Favorite, WishList)
+
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    list_filter = ("email", "username")
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ("pk", "title", "dimension", "recipes")
+    list_display = ("pk", "title", "dimension")
     empty_value_display = '-пусто-'
+    search_fields = ("title",)
+    list_filter = ("title", )
 
 
 class TagAdmin(admin.ModelAdmin):
@@ -19,6 +29,8 @@ class RecipeIngredientInline(admin.TabularInline):
 
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (RecipeIngredientInline,)
+    list_display = ("title", "author", )
+    list_filter = ("title", )
 
 
 class FollowAdmin(admin.ModelAdmin):

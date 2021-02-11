@@ -112,9 +112,9 @@ def profile_page(request, username):
     user = get_object_or_404(User, username=username)
     tag_filters = request.GET.getlist("filters")
     if tag_filters:
-        recipes = Recipe.objects.filter(author=user, tags__slug__in=tag_filters).distinct()
+        recipes = Recipe.objects.filter(author=user, tags__slug__in=tag_filters).select_related("author").prefetch_related('tags').distinct()
     else:
-        recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags').order_by("-pub_date")
+        recipes = Recipe.objects.filter(author=user).select_related("author").prefetch_related('tags')
     paginator = Paginator(recipes, 6)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)

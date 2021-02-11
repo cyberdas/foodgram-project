@@ -62,6 +62,7 @@ def delete_purchases(request, id):
     WishList.objects.filter(user=user, recipe=recipe).delete()
     return JsonResponse({"success": True})
 
+
 @login_required
 def get_wishlist(request):
     user = request.user

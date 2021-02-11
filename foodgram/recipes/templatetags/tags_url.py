@@ -5,7 +5,6 @@ register = template.Library()
 
 @register.filter
 def new_filter_link(request, tag):
-    # tag = tag.slug
     new_request = request.GET.copy()
     if tag in request.GET.getlist("filters"):
         filters = request.GET.getlist("filters")
