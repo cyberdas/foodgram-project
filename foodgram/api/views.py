@@ -13,7 +13,8 @@ from users.models import User
 @require_http_methods(["GET"])
 def get_ingredients(request):
     query = request.GET.get('query')
-    ingredients = Ingredient.objects.filter(title__contains=query).values('title', 'dimension')
+    ingredients = Ingredient.objects.filter(title__contains=query).values(
+        'title', 'dimension')
     return JsonResponse(list(ingredients), safe=False)
 
 
@@ -22,7 +23,8 @@ def add_subscription(request):
     id = int(json.loads(request.body)["id"])
     user = request.user
     if user.id != id:
-        _, created = Follow.objects.get_or_create(user=user, author=User.objects.get(pk=id))
+        _, created = Follow.objects.get_or_create(
+            user=user, author=User.objects.get(pk=id))
         if created:
             return JsonResponse({"success": True})
     return JsonResponse({"success": False})
