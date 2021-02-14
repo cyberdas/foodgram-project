@@ -1,12 +1,15 @@
 import json
+
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from recipes.models import Follow, Favorite, Recipe, WishList, Ingredient, RecipeIngredient, User
+from django.views.decorators.http import require_http_methods
+
+from recipes.models import (Favorite, Follow, Ingredient, Recipe,
+                            RecipeIngredient, WishList)
+from users.models import User
 
 
-# Create your views here.
 @require_http_methods(["GET"])
 def get_ingredients(request):
     query = request.GET.get('query')
@@ -76,7 +79,7 @@ def get_wishlist(request):
             ingredients[ingredient.ingredient] = ingredient.amount
     ingredients_response = []
     for k, v in ingredients.items():
-        ingredients_response.append(f"{k.title} ({k.dimension}) — {v} \n")
+        ingredients_response.append(f"{k.title} ({k.dimension}) - {v} \n")
     response = HttpResponse(ingredients_response, content_type="text/plain")
     response['Content-Disposition'] = 'attachment; filename="ingrediens.txt"'
     return response

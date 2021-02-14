@@ -1,10 +1,13 @@
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from users.models import User
+
 from .forms import RecipeForm
-from .models import (Recipe, RecipeIngredient, Tag, Ingredient,
-                     User, Follow, Favorite, WishList)
+from .models import (Favorite, Follow, Ingredient, Recipe, RecipeIngredient,
+                     WishList)
 from .utils import get_ingredients
 
 
@@ -23,7 +26,7 @@ def index(request):
         "tag_filters": tag_filters
     }
     if request.user.is_authenticated:
-        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user).select_related("wishlist_recipe")
+        wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
         context["wishlist"] = wishlist
     return render(request, 'index.html', context)
 
@@ -46,7 +49,6 @@ def feed(request):
 
 @login_required
 def new_recipe(request):
-    tags = Tag.objects.all()
     if request.method == "POST":
         form = RecipeForm(request.POST, files=request.FILES)
         if form.is_valid():
@@ -63,16 +65,15 @@ def new_recipe(request):
                 RecipeIngredient.objects.bulk_create(objs)
                 form.save_m2m()
                 return redirect(reverse('index'))
-        return render(request, 'new_recipe.html', {"form": form, "tags": tags})
+        return render(request, 'new_recipe.html', {"form": form, })
     form = RecipeForm()
-    return render(request, 'new_recipe.html', {"form": form, "tags": tags})
+    return render(request, 'new_recipe.html', {"form": form, })
 
 
 @login_required
 def recipe_edit(request, username, recipe_id):
     user = get_object_or_404(User, username=username)
     recipe = get_object_or_404(Recipe.objects.prefetch_related("tags"), pk=recipe_id)
-    tags = Tag.objects.all()
     recipe_tags = recipe.tags.all()
     if request.user != user:
         return redirect('recipe_page', username, recipe_id)
@@ -93,7 +94,6 @@ def recipe_edit(request, username, recipe_id):
     context = {
         "form": form,
         "recipe": recipe,
-        "tags": tags,
         "recipe_tags": recipe_tags,
     }
     return render(request, "recipe_edit.html", context)
@@ -180,16 +180,3 @@ def get_purchases(request):
         "recipes": recipes
     }
     return render(request, "shopList.html", context)
-
-
-def page_not_found(request, exception):
-    return render(
-        request,
-        "misc/404.html",
-        {"path": request.path},
-        status=404
-    )
-
-
-def server_error(request):
-    return render(request, "misc/500.html", status=500)

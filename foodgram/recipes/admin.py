@@ -1,14 +1,7 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import (User, Recipe, Ingredient, RecipeIngredient, Tag,
-                     Follow, Favorite, WishList)
 
-admin.site.unregister(User)
-
-
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_filter = ("email", "username")
+from .models import (Favorite, Follow, Ingredient, Recipe, RecipeIngredient,
+                     Tag, WishList)
 
 
 class IngredientAdmin(admin.ModelAdmin):

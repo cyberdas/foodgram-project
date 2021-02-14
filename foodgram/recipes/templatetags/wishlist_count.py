@@ -1,4 +1,5 @@
 from django import template
+
 from recipes.models import WishList
 
 register = template.Library()
