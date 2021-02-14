@@ -156,7 +156,10 @@ def favorites(request):
     user = request.user
     tag_filters = request.GET.getlist("filters")
     if tag_filters:
-        recipes = Recipe.objects.filter(favorite_recipe__user=user, tags__slug__in=tag_filters).select_related("author").prefetch_related("tags").distinct()  # custom filter?, рецепты дублируются
+        recipes = Recipe.objects.filter(
+            favorite_recipe__user=user,
+            tags__slug__in=tag_filters).select_related(
+            "author").prefetch_related("tags").distinct()
     else:
         recipes = Recipe.objects.filter(favorite_recipe__user=user).select_related("author").prefetch_related("tags")
     wishlist = Recipe.objects.filter(wishlist_recipe__user=user)
@@ -174,7 +177,7 @@ def favorites(request):
 
 @login_required
 def get_purchases(request):
-    # рецепты, которые добавили в список покупок
+    """Рецепты, которые добавили в список покупок"""
     recipes = Recipe.objects.filter(wishlist_recipe__user=request.user, )
     context = {
         "recipes": recipes
