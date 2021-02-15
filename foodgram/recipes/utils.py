@@ -6,3 +6,7 @@ def get_ingredients(request):
             ingredients[request.POST[key]] = request.POST[
                 "valueIngredient_" + value_ingredient]
     return ingredients
+
+
+def save_recipe(*args, **kwargs):
+    pass

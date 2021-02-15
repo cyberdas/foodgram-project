@@ -8,49 +8,37 @@
     {% block content %}
         <div class="main__header">
             <h1 class="main__title">Рецепты</h1>
-            <ul class="tags">
-                {% for tag in all_tags %}
-                <li class="tags__item">
-                    <a id="{{tag.slug}}" class="tags__checkbox 
-                    tags__checkbox_style_{{tag.color}} 
-                    {% if tag.slug in tag_filters %}
-                    tags__checkbox_active
-                    {% else %}
-                    tags__checkbox
-                    {% endif %}"
-                    href="{% url 'index' %}?{{request|new_filter_link:tag.slug}}"></a>
-                    <span class="tags__label">{{tag.name}}</span>
-                </li>
-                {% endfor %}
-            </ul>
+            {% include 'includes/tags.html'%}
         </div>
         <div class="card-list">
             {% for recipe in page %}
-            <div class="card" data-id="{{recipe.id}}">
-            <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" class="link" target="_blank"><img src="{{recipe.image.url}}" alt="Фото" class="card__image"></a> <!-- ссылка на рецепт?-->
-            <div class="card__body">
-                <a class="card__title link" href="{% url 'recipe_page' recipe.author.username recipe.id %}" target="_blank">{{recipe.title}}</a>
-                <ul class="card__items">
-                    {% for tag in recipe.tags.all %}
-                    <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
-                    {% endfor %}
-                </ul>
-                <div class="card__items card__items_column">
-                    <p class="card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
-                    <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile_page' recipe.author.username %}" style="color: black">{{ recipe.author }}</a></p> <!-- ссылка на страницу автора -->
+                <div class="card" data-id="{{ recipe.id }}">
+                <a href="{% url 'recipe_page' recipe.author.username recipe.id %}" 
+                    class="link" target="_blank"><img src="{{ recipe.image.url }}" alt="Фото" class="card__image"></a>
+                    <div class="card__body">
+                    <a class="card__title link" href="{% url 'recipe_page' recipe.author.username recipe.id %}" 
+                        target="_blank">{{ recipe.title }}</a>
+                    <ul class="card__items">
+                        {% for tag in recipe.tags.all %}
+                        <li class="card__item"><span class="badge badge_style_{{ tag.color }}">{{ tag.name }}</span></li>
+                        {% endfor %}
+                    </ul>
+                    <div class="card__items card__items_column">
+                        <p class="card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
+                        <p class="card__text"><span class="icon-user"></span> <a href="{% url 'profile_page' recipe.author.username %}" style="color: black">{{ recipe.author }}</a></p>
+                    </div>
+                    <div class="card__footer">
+                        {% csrf_token %}
+                        {% if request.user.is_authenticated %}
+                        {% if recipe in wishlist %}
+                        <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
+                        {% else %}
+                        <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    </div>
                 </div>
-                <div class="card__footer">
-                    {% csrf_token %}
-                    {% if request.user.is_authenticated %}
-                    {% if recipe in wishlist %}
-                    <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
-                    {% else %}
-                    <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon"></span>Добавить в покупки</button>
-                    {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
             {% endfor %}
         </div>
         {% if page.has_other_pages %}
@@ -75,5 +63,3 @@
     <script src="{% static 'indexNotAuth.js' %}"></script>
 {% endif %}
 {% endblock %}
-</body>
-</html>

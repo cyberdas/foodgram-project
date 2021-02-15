@@ -1,19 +1,10 @@
+{% extends 'base.html' %}
 {% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Список покупок</title>
+    {% block title %}Список покупок{% endblock %}
+    {% block static %}
     <link rel="stylesheet" href="{% static 'pages/shopList.css' %}">
-</head>
-<body class="body">
-<header class="header">
-    {% include 'nav.html '%}
-</header>
-<main class="main container">
+    {% endblock %}
+    {% block content %}
     <div class="main__header">
         <h1 class="main__title">Список покупок</h1>
     </div>
@@ -21,21 +12,19 @@
         <ul class="shopping-list">
             {% csrf_token %}
             {% for recipe in recipes %}
-            <li class="shopping-list__item" data-id="{{recipe.id}}">
-                <div class="recipe recipe_reverse">
-                    <img src="{{recipe.image.url}}" alt="какой-то текст" class="recipe__image recipe__image_big">
-                    <h3 class="recipe__title">{{recipe.title}}</h3>
-                    <p class="recipe__text"><span class="icon-time"></span> {{recipe.cooking_time}} мин.</p>
-                </div>
-                <a href="#" class="shopping-list__button link">Удалить</a>
-            </li>
+                <li class="shopping-list__item" data-id="{{ recipe.id }}">
+                    <div class="recipe recipe_reverse">
+                        <img src="{{ recipe.image.url }}" alt="какой-то текст" class="recipe__image recipe__image_big">
+                        <h3 class="recipe__title">{{ recipe.title }}</h3>
+                        <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
+                    </div>
+                    <a href="#" class="shopping-list__button link">Удалить</a>
+                </li>
             {% endfor%}
         </ul>
         <a href="{% url 'get_wishlist' %}"><button class="button button_style_blue">Скачать список</button></a>
-
-
     </div>
-</main>
+    {% endblock%}
     {% include 'footer.html' %}
 <script src="{% static 'js/config/config.js' %}"></script>
 <script src="{% static 'js/components/Header.js' %}"></script>
