@@ -12,9 +12,9 @@ from users.models import User
 
 @require_http_methods(["GET"])
 def get_ingredients(request):
-    query = request.GET.get('query')
+    query = request.GET.get("query")
     ingredients = Ingredient.objects.filter(title__contains=query).values(
-        'title', 'dimension')
+        "title", "dimension")
     return JsonResponse(list(ingredients), safe=False)
 
 
@@ -38,7 +38,7 @@ def remove_subscription(request, author_id):
         subscription = get_object_or_404(
             Follow, user=request.user, author=author)
         subscription.delete()
-        return JsonResponse({'success': True})
+        return JsonResponse({"success": True})
     return JsonResponse({"success": False})
 
 
