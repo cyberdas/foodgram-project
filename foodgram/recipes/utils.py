@@ -10,3 +10,7 @@ def get_ingredients(request):
 
 def save_recipe(*args, **kwargs):
     pass
+
+
+def get_tags(*args, **kwargs):
+    pass

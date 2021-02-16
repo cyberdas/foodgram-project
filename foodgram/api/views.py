@@ -20,51 +20,66 @@ def get_ingredients(request):
 
 @require_http_methods(["POST"])
 def add_subscription(request):
-    id = int(json.loads(request.body)["id"])
+    body = json.loads(request.body)
+    author_id = body.get("id", None)
+    author = get_object_or_404(User, pk=author_id)
     user = request.user
-    if user.id != id:
-        _, created = Follow.objects.get_or_create(
-            user=user, author=User.objects.get(pk=id))
-        if created:
-            return JsonResponse({"success": True})
+    if author != user:
+        obj, created = Follow.objects.get_or_create(
+            user=user, author=author)
+        return JsonResponse({"success": created})
     return JsonResponse({"success": False})
 
 
 @require_http_methods(["DELETE"])
-def remove_subscription(request, id):
-    Follow.objects.filter(user=request.user, author_id=id).delete()
-    return JsonResponse({"success": True})
+def remove_subscription(request, author_id):
+    author = get_object_or_404(User, pk=author_id)
+    if request.user != author:
+        subscription = get_object_or_404(
+            Follow, user=request.user, author=author)
+        subscription.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({"success": False})
 
 
 @require_http_methods(["POST"])
 def add_favorite(request):
-    id = int(json.loads(request.body)["id"])
-    user = request.user
-    Favorite.objects.get_or_create(user=user, recipe=Recipe.objects.get(pk=id))
-    return JsonResponse({"success": True})
+    body = json.loads(request.body)
+    recipe_id = body.get("id", None)
+    if recipe_id:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        user = request.user
+        obj, created = Favorite.objects.get_or_create(user=user, recipe=recipe)
+        return JsonResponse({"success": created})
+    return JsonResponse({"success": False})
 
 
 @require_http_methods(["DELETE"])
-def remove_favorite(request, id):
+def remove_favorite(request, recipe_id):
     user = request.user
-    Favorite.objects.filter(user=user, recipe_id=id).delete()
+    recipe = get_object_or_404(Favorite, user=user, recipe_id=recipe_id)
+    recipe.delete()
     return JsonResponse({"success": True})
 
 
 @require_http_methods(["POST"])
 def add_purchases(request):
     user = request.user
-    recipe_id = int(json.loads(request.body)["id"])
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    WishList.objects.get_or_create(user=user, recipe_id=recipe_id)
-    return JsonResponse({"sucess": True})
+    body = json.loads(request.body)
+    recipe_id = body.get("id", None)
+    if recipe_id:
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        obj, created = WishList.objects.get_or_create(user=user, recipe=recipe)
+        return JsonResponse({"success": created})
+    return JsonResponse({"success": False})
 
 
 @require_http_methods(["DELETE"])
-def delete_purchases(request, id):
+def delete_purchases(request, recipe_id):
     user = request.user
-    recipe = get_object_or_404(Recipe, pk=id)
-    WishList.objects.filter(user=user, recipe=recipe).delete()
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    recipe_wishlist = get_object_or_404(WishList, user=user, recipe=recipe)
+    recipe_wishlist.delete()
     return JsonResponse({"success": True})
 
 
@@ -75,7 +90,7 @@ def get_wishlist(request):
     ingredients = {}
     ingredients_filter = RecipeIngredient.objects.filter(recipe_id__in=recipes)
     for ingredient in ingredients_filter:
-        if ingredient.ingredient in ingredients.keys():
+        if ingredient.ingredient in ingredients:
             ingredients[ingredient.ingredient] += ingredient.amount
         else:
             ingredients[ingredient.ingredient] = ingredient.amount
