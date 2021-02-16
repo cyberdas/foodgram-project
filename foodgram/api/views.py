@@ -77,9 +77,8 @@ def add_purchases(request):
 @require_http_methods(["DELETE"])
 def delete_purchases(request, recipe_id):
     user = request.user
-    recipe = get_object_or_404(Recipe, pk=recipe_id)
-    recipe_wishlist = get_object_or_404(WishList, user=user, recipe=recipe)
-    recipe_wishlist.delete()
+    recipe = get_object_or_404(WishList, user=user, recipe_id=recipe_id)
+    recipe.delete()
     return JsonResponse({"success": True})
 
 
