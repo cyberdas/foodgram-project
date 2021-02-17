@@ -22,7 +22,7 @@ def index(request):
         recipes = Recipe.objects.select_related(
             "author").prefetch_related("tags").all()
     paginator = Paginator(recipes, items_for_pagination)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     context = {
         "page": page,
@@ -32,7 +32,7 @@ def index(request):
     if request.user.is_authenticated:
         wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
         context["wishlist"] = wishlist
-    return render(request, 'index.html', context)
+    return render(request, "index.html", context)
 
 
 @login_required
@@ -42,7 +42,7 @@ def feed(request):
         "author_recipes").order_by("id")
     recipes = Recipe.objects.filter(author__following__user=request.user)
     paginator = Paginator(following, items_for_pagination)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     context = {
         "recipes": recipes,
@@ -64,7 +64,7 @@ def new_recipe(request):
         else:
             save_recipe(request, ingredients, new_recipe)
             return redirect(reverse("index"))
-    return render(request, 'new_recipe.html', {"form": form})
+    return render(request, "new_recipe.html", {"form": form})
 
 
 @login_required
@@ -133,7 +133,7 @@ def profile_page(request, username):
         context["following"] = following
         context["favorites"] = favorites
         context["wishlist"] = wishlist
-    return render(request, 'profile_page.html', context)
+    return render(request, "profile_page.html", context)
 
 
 def recipe_page(request, username, recipe_id):
