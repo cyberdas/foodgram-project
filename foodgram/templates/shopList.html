@@ -18,18 +18,18 @@
                         <h3 class="recipe__title">{{ recipe.title }}</h3>
                         <p class="recipe__text"><span class="icon-time"></span>{{recipe.cooking_time}} мин.</p>
                     </div>
-                    <a href="#" class="shopping-list__button link">Удалить</a>
+                    <button class="button shopping-list__button link">Удалить</button>
                 </li>
             {% endfor%}
         </ul>
         <a href="{% url 'get_wishlist' %}"><button class="button button_style_blue">Скачать список</button></a>
     </div>
     {% endblock%}
-    {% include 'footer.html' %}
+
+{% block script %}
 <script src="{% static 'js/config/config.js' %}"></script>
 <script src="{% static 'js/components/Header.js' %}"></script>
 <script src="{% static 'js/components/ShopList.js' %}"></script>
 <script src="{% static 'js/api/Api.js' %}"></script>
 <script src="{% static 'shopList.js' %}"></script>
-</body>
-</html>
+{% endblock %}

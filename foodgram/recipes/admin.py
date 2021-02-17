@@ -6,7 +6,7 @@ from .models import (Favorite, Follow, Ingredient, Recipe, RecipeIngredient,
 
 class IngredientAdmin(admin.ModelAdmin):
     list_display = ("pk", "title", "dimension")
-    empty_value_display = '-пусто-'
+    empty_value_display = "-пусто-"
     search_fields = ("title",)
     list_filter = ("title", )
 
