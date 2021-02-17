@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load count_filter %}
     {% block title %}Мои подписки{% endblock %}
     {% block static %}
     <link rel="stylesheet" href="{% static 'pages/myFollow.css' %}">
@@ -30,7 +29,7 @@
                     {% endfor %}
                     <li class="card-user__item">
                         <a href="{% url 'profile_page' author.username %}" 
-                        class="card-user__link link">Еще {{ author.author_recipes.all.count|count_filter }} рецептов...</a>
+                        class="card-user__link link">Еще {{ author.author_recipes.all.count|add:"-3"}} рецептов...</a>
                     </li>
                     {% else %}
                     {% for recipe in author.author_recipes.all %}
@@ -39,7 +38,7 @@
                             <div class="recipe">
                                 <img src="{{ recipe.image.url }}" alt="{{ recipe.title }}" class="recipe__image">
                                 <h3 class="recipe__title">{{recipe.title}}</h3>
-                                <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time} } мин.</p>
+                                <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.</p>
                             </div>
                         </li>
                     {% endfor %}
@@ -57,7 +56,7 @@
         {% endfor %}
     </div>
     {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator %}   
+        {% include 'includes/paginator.html' with items=page paginator=paginator %}   
     {% endif %}
 {% endblock %}
 {% block script %}

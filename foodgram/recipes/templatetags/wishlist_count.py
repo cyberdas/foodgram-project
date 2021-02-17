@@ -1,11 +1,11 @@
 from django import template
 
-from recipes.models import WishList
+from users.models import User
 
 register = template.Library()
 
 
 @register.filter
 def wishlist_count(user):
-    result = WishList.objects.filter(user=user).count()
+    result = User.objects.filter(wishlist__user=user).count()
     return result

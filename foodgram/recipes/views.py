@@ -3,12 +3,13 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from foodgram.settings import items_for_pagination
 from users.models import User
 
 from .forms import RecipeForm
-from .models import (Favorite, Follow, Ingredient, Recipe, RecipeIngredient,
+from .models import (Favorite, Follow, Recipe, RecipeIngredient,
                      WishList)
-from .utils import get_ingredients
+from .utils import get_ingredients, save_recipe
 
 
 def index(request):
@@ -20,7 +21,7 @@ def index(request):
     else:
         recipes = Recipe.objects.select_related(
             "author").prefetch_related("tags").all()
-    paginator = Paginator(recipes, 6)
+    paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
@@ -40,7 +41,7 @@ def feed(request):
         following__user=request.user).prefetch_related(
         "author_recipes").order_by("id")
     recipes = Recipe.objects.filter(author__following__user=request.user)
-    paginator = Paginator(following, 6)
+    paginator = Paginator(following, items_for_pagination)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
@@ -57,17 +58,11 @@ def new_recipe(request):
     form = RecipeForm(request.POST or None, files=request.FILES or None)
     if form.is_valid():
         new_recipe = form.save(commit=False)
-        new_recipe.author = request.user
-        new_recipe.save()
         ingredients = get_ingredients(request)
         if not ingredients:
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         else:
-            objs = [RecipeIngredient(recipe=new_recipe, amount=value,
-                    ingredient=get_object_or_404(Ingredient, title=title))
-                    for title, value in ingredients.items()]
-            RecipeIngredient.objects.bulk_create(objs)
-            form.save()
+            save_recipe(request, ingredients, new_recipe)
             return redirect(reverse("index"))
     return render(request, 'new_recipe.html', {"form": form})
 
@@ -88,10 +83,8 @@ def recipe_edit(request, username, recipe_id):
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         else:
             RecipeIngredient.objects.filter(recipe_id=recipe.id).delete()
-            objs = [RecipeIngredient(recipe=recipe, amount=value,
-                    ingredient=get_object_or_404(Ingredient, title=title))
-                    for title, value in ingredients.items()]
-            RecipeIngredient.objects.bulk_create(objs)
+            new_recipe = form.save(commit=False)
+            save_recipe(request, ingredients, new_recipe)
             form.save()
             return redirect("recipe_page", username=username,
                             recipe_id=recipe_id)
@@ -123,7 +116,7 @@ def profile_page(request, username):
         recipes = Recipe.objects.filter(
             author=user).select_related(
             "author").prefetch_related("tags")
-    paginator = Paginator(recipes, 6)
+    paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     context = {
@@ -177,7 +170,7 @@ def favorites(request):
             favorite_recipe__user=user).select_related(
             "author").prefetch_related("tags")
     wishlist = Recipe.objects.filter(wishlist_recipe__user=user)
-    paginator = Paginator(recipes, 6)
+    paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
     context = {
