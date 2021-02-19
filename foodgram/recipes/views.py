@@ -98,18 +98,9 @@ def recipe_delete(request, username, recipe_id):
     return redirect("profile_page", username=username)
 
 
-def profile_page(request, username):  #
+def profile_page(request, username):
     user = get_object_or_404(User, username=username)
-    tag_filters, recipes = get_recipes(request, user)
-    tag_filters = request.GET.getlist("filters")
-    if tag_filters:
-        recipes = Recipe.objects.filter(
-            author=user, tags__slug__in=tag_filters).select_related(
-            "author").prefetch_related("tags").distinct()
-    else:
-        recipes = Recipe.objects.filter(
-            author=user).select_related(
-            "author").prefetch_related("tags")
+    tag_filters, recipes = get_recipes(request, user=user)
     paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -152,19 +143,10 @@ def recipe_page(request, username, recipe_id):
 
 
 @login_required
-def favorites(request):  #
-    user = request.user
-    tag_filters = request.GET.getlist("filters")
-    if tag_filters:
-        recipes = Recipe.objects.filter(
-            favorite_recipe__user=user,
-            tags__slug__in=tag_filters).select_related(
-            "author").prefetch_related("tags").distinct()
-    else:
-        recipes = Recipe.objects.filter(
-            favorite_recipe__user=user).select_related(
-            "author").prefetch_related("tags")
-    wishlist = Recipe.objects.filter(wishlist_recipe__user=user)
+def favorites(request):
+    favorite_user = request.user
+    tag_filters, recipes = get_recipes(request, favorite_user=favorite_user)
+    wishlist = Recipe.objects.filter(wishlist_recipe__user=favorite_user)
     paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)

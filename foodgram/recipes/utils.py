@@ -2,15 +2,18 @@ from django.shortcuts import get_object_or_404
 
 from .models import Ingredient, RecipeIngredient, Recipe
 
-# для profile_page и favorites
-def get_recipes(request):
+
+def get_recipes(request, user=None, favorite_user=None):
     tag_filters = request.GET.getlist("filters")
     if tag_filters:
-        recipes = Recipe.objects.filter(
-            tags__slug__in=tag_filters).select_related(
+        recipes = Recipe.objects.custom_filter(
+            author=user, tags__slug__in=tag_filters,
+            favorite_recipe__user=favorite_user).select_related(
             "author").prefetch_related("tags").distinct()
     else:
-        recipes = Recipe.objects.select_related(
+        recipes = Recipe.objects.custom_filter(
+            author=user,
+            favorite_recipe__user=favorite_user).select_related(
             "author").prefetch_related("tags").all()
     return [tag_filters, recipes]
 

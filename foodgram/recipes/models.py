@@ -3,6 +3,12 @@ from django.db import models
 from users.models import User
 
 
+class CustomManager(models.Manager):
+    def custom_filter(self, *args, **kwargs):
+        updated_kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        return super().filter(*args, **updated_kwargs)
+
+
 class Ingredient(models.Model):
     title = models.CharField(
         max_length=200, verbose_name='Название ингредиента')
@@ -32,6 +38,7 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
+    objects = CustomManager()
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='author_recipes',
         verbose_name='Автор')
