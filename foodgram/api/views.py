@@ -21,7 +21,7 @@ def get_ingredients(request):
 @require_http_methods(["POST"])
 def add_subscription(request):
     body = json.loads(request.body)
-    author_id = body.get("id", None)
+    author_id = body.get("id")
     author = get_object_or_404(User, pk=author_id)
     user = request.user
     if author != user:
@@ -45,7 +45,7 @@ def remove_subscription(request, author_id):
 @require_http_methods(["POST"])
 def add_favorite(request):
     body = json.loads(request.body)
-    recipe_id = body.get("id", None)
+    recipe_id = body.get("id")
     if recipe_id:
         recipe = get_object_or_404(Recipe, id=recipe_id)
         user = request.user
@@ -66,7 +66,7 @@ def remove_favorite(request, recipe_id):
 def add_purchases(request):
     user = request.user
     body = json.loads(request.body)
-    recipe_id = body.get("id", None)
+    recipe_id = body.get("id")
     if recipe_id:
         recipe = get_object_or_404(Recipe, id=recipe_id)
         obj, created = WishList.objects.get_or_create(user=user, recipe=recipe)

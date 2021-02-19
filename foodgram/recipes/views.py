@@ -9,18 +9,11 @@ from users.models import User
 from .forms import RecipeForm
 from .models import (Favorite, Follow, Recipe, RecipeIngredient,
                      WishList)
-from .utils import get_ingredients, save_recipe
+from .utils import get_ingredients, save_recipe, get_recipes
 
 
 def index(request):
-    tag_filters = request.GET.getlist("filters")
-    if tag_filters:
-        recipes = Recipe.objects.filter(
-            tags__slug__in=tag_filters).select_related(
-            "author").prefetch_related("tags").distinct()
-    else:
-        recipes = Recipe.objects.select_related(
-            "author").prefetch_related("tags").all()
+    tag_filters, recipes = get_recipes(request)
     paginator = Paginator(recipes, items_for_pagination)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
@@ -105,8 +98,9 @@ def recipe_delete(request, username, recipe_id):
     return redirect("profile_page", username=username)
 
 
-def profile_page(request, username):
+def profile_page(request, username):  #
     user = get_object_or_404(User, username=username)
+    tag_filters, recipes = get_recipes(request, user)
     tag_filters = request.GET.getlist("filters")
     if tag_filters:
         recipes = Recipe.objects.filter(
@@ -137,9 +131,10 @@ def profile_page(request, username):
 
 
 def recipe_page(request, username, recipe_id):
+    user = get_object_or_404(User, username=username)
     recipe = get_object_or_404(Recipe.objects.select_related(
         "author").prefetch_related(
-        "recipe_ingredients"), pk=recipe_id)
+        "recipe_ingredients"), pk=recipe_id, author=user)
     context = {
         "recipe": recipe,
     }
@@ -157,7 +152,7 @@ def recipe_page(request, username, recipe_id):
 
 
 @login_required
-def favorites(request):
+def favorites(request):  #
     user = request.user
     tag_filters = request.GET.getlist("filters")
     if tag_filters:
