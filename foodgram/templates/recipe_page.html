@@ -11,7 +11,7 @@
                 <div class="single-card__header-info">
                     <h1 class="single-card__title">{{ recipe.title}}</h1>
                     <div class="single-card__favorite">
-                        {% if request.user.is_authenticated %}
+                        {% if request.user.is_authenticated and request.user != recipe.author %}
                         {% if favorite %}
                         <button class="button button_style_none" name="favorites"><span class="icon-favorite icon-favorite_big icon-favorite_active"></span></button>
                         <div class="single-card__favorite-tooltip tooltip">Убрать из избранного</div>

@@ -56,6 +56,7 @@ def new_recipe(request):
             form.add_error(None, "Добавьте хотя бы один ингредиент")
         else:
             save_recipe(request, ingredients, new_recipe)
+            form.save_m2m()
             return redirect(reverse("index"))
     return render(request, "new_recipe.html", {"form": form})
 
@@ -78,7 +79,7 @@ def recipe_edit(request, username, recipe_id):
             RecipeIngredient.objects.filter(recipe_id=recipe.id).delete()
             new_recipe = form.save(commit=False)
             save_recipe(request, ingredients, new_recipe)
-            form.save()
+            form.save_m2m()
             return redirect("recipe_page", username=username,
                             recipe_id=recipe_id)
     context = {
