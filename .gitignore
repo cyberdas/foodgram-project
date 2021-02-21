@@ -2,6 +2,7 @@
 .git/*
 env/
 venv/
+ubuntu-env/
 
 __pycache__/
 *.py[cod]
