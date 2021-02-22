@@ -27,8 +27,9 @@ python manage.py migrate
 
 python manage.py createsuperuser
 ```
-6) Также есть возможность загрузить стартовые данные из файлы dump.json, перед этим
+6) Также есть возможность загрузить стартовые данные из файла dump.json
 ```
+python manage.py shell 
 # выполнить в открывшемся терминале:
 >>> from django.contrib.contenttypes.models import ContentType
 >>> ContentType.objects.all().delete()
