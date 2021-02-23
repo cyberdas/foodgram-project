@@ -22,8 +22,6 @@ services:
         - db
     env_file:
         - ./.env
-    ports:
-        - "8000:8000"
  nginx:
     image: nginx:1.19.5-alpine
     restart: always
