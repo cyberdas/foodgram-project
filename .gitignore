@@ -16,5 +16,6 @@ __pycache__/
 *.sublime-workspace
 
 media/
+.env
 db.sqlite3
 *.log

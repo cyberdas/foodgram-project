@@ -17,7 +17,7 @@ services:
     restart: always
     volumes:
 	    - static_volume:/foodgram/static
-        - media_volume:/foodgram/media
+      - media_volume:/foodgram/media
     depends_on:
         - db
     env_file:
