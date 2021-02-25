@@ -16,8 +16,8 @@ services:
     build: .
     restart: always
     volumes:
-        - static_volume:/foodgram/static
-        - media_volume:/foodgram/media
+	    - static_volume:/foodgram/static
+      - media_volume:/foodgram/media
     depends_on:
         - db
     env_file:
@@ -33,4 +33,3 @@ services:
         - 80:80
     depends_on:
         - web
-

@@ -25,7 +25,9 @@ def get_ingredients(request):
             value_ingredient = key[15:]
             ingredients[request.POST[key]] = request.POST[
                 "valueIngredient_" + value_ingredient]
-    return ingredients
+    if all(int(value) > 0 for value in ingredients.values()):
+        return ingredients
+    return {}
 
 
 def save_recipe(request, ingredients, new_recipe):

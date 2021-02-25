@@ -23,8 +23,10 @@ def index(request):
         "tag_filters": tag_filters
     }
     if request.user.is_authenticated:
+        favorites = Recipe.objects.filter(favorite_recipe__user=request.user)
         wishlist = Recipe.objects.filter(wishlist_recipe__user=request.user)
         context["wishlist"] = wishlist
+        context["favorites"] = favorites
     return render(request, "index.html", context)
 
 
@@ -53,7 +55,8 @@ def new_recipe(request):
         new_recipe = form.save(commit=False)
         ingredients = get_ingredients(request)
         if not ingredients:
-            form.add_error(None, "Добавьте хотя бы один ингредиент")
+            form.add_error(None, "Добавьте хотя бы один ингредиент, \
+                количество ингредиентов должно быть положительным")
         else:
             save_recipe(request, ingredients, new_recipe)
             form.save_m2m()
@@ -74,7 +77,8 @@ def recipe_edit(request, username, recipe_id):
     if form.is_valid():
         ingredients = get_ingredients(request)
         if not ingredients:
-            form.add_error(None, "Добавьте хотя бы один ингредиент")
+            form.add_error(None, "Добавьте хотя бы один ингредиент, \
+                количество ингредиентов должно быть положительным")
         else:
             RecipeIngredient.objects.filter(recipe_id=recipe.id).delete()
             new_recipe = form.save(commit=False)
