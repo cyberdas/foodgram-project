@@ -9,6 +9,7 @@ from users.models import User
 from .forms import RecipeForm
 from .models import (Favorite, Follow, Recipe, RecipeIngredient,
                      WishList)
+from .tasks import send_email_task
 from .utils import get_ingredients, save_recipe, get_recipes
 
 
@@ -57,6 +58,7 @@ def new_recipe(request):
         else:
             save_recipe(request, ingredients, new_recipe)
             form.save_m2m()
+            send_email_task.delay(request.user.username)
             return redirect(reverse("index"))
     return render(request, "new_recipe.html", {"form": form})
 

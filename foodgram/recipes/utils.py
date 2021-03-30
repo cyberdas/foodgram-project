@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 
-from .models import Ingredient, RecipeIngredient, Recipe
+from .models import Ingredient, RecipeIngredient, Recipe, Follow
+
+from users.models import User
 
 
 def get_recipes(request, user=None, favorite_user=None):
@@ -35,3 +37,10 @@ def save_recipe(request, ingredients, new_recipe):
             ingredient=get_object_or_404(Ingredient, title=title))
             for title, value in ingredients.items()]
     RecipeIngredient.objects.bulk_create(objs)
+
+
+def send_email_to_followers(username):
+    author = User.objects.get(username=username)
+    queryset = Follow.objects.filter(author=author)
+    email_list = [instance.user.email for instance in queryset]
+    return email_list
