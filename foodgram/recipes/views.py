@@ -1,8 +1,9 @@
-import time
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.generic import ListView
 
 from foodgram.settings import items_for_pagination
 from users.models import User
@@ -13,7 +14,7 @@ from .models import (Favorite, Follow, Recipe, RecipeIngredient,
 from .tasks import send_email_task
 from .utils import get_ingredients, save_recipe, get_recipes
 
-
+# index через class based views?
 def index(request):
     tag_filters, recipes = get_recipes(request)
     paginator = Paginator(recipes, items_for_pagination)
@@ -30,8 +31,23 @@ def index(request):
     return render(request, "index.html", context)
 
 
+class FollowListView(LoginRequiredMixin, ListView):
+
+    template_name = "new_feed.html"
+    paginate_by = items_for_pagination
+
+    def get_queryset(self):
+        queryset = User.objects.filter(
+            following__user=self.request.user).prefetch_related(
+                "author_recipes").order_by("id")
+        return queryset
+
+
 @login_required
 def feed(request):
+    """
+    Подписка на авторов
+    """
     following = User.objects.filter(
         following__user=request.user).prefetch_related(
         "author_recipes").order_by("id")
@@ -148,6 +164,9 @@ def recipe_page(request, username, recipe_id):
 
 @login_required
 def favorites(request):
+    """
+    Избранные рецепты
+    """
     favorite_user = request.user
     tag_filters, recipes = get_recipes(request, favorite_user=favorite_user)
     wishlist = Recipe.objects.filter(wishlist_recipe__user=favorite_user)

@@ -1,6 +1,5 @@
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
-from django.urls import reverse
 
 from foodgram.celery import app
 from .utils import send_email_to_followers
