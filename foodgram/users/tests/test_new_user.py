@@ -2,13 +2,8 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from users.models import User
-# создание нового пользователя правильный/неправильный email
-# после регистрации отправляет на главную страницу сразу
-# доступ к about, technologies
-# follow
-# favorite
-# shoplist
-# добавить в покупки
+
+
 class UserRegistrationTest(TestCase):
     """
     Регистрация нового пользователя
@@ -16,7 +11,7 @@ class UserRegistrationTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        User.objects.create(
+        cls.user = User.objects.create(
             username="testuser",
             email="newemail@google.com",
             password="testpassword")
@@ -42,15 +37,7 @@ class UserRegistrationTest(TestCase):
         response = self.client.post(self.url, data=data, follow=True)
         self.assertFormError(response, "form", "email", "Данный email уже занят")
 
-    def test_login(self):  # создавать пользователя и логиниться
-        self.client.login()
+    def test_login(self):
+        self.client.force_login(UserRegistrationTest.user)
         response = self.client.get(self.url)
-        self.assertContains(response, text="Избранное")
-
-    def test_about_page(self):
-        response = self.client.get("about/author")
-        self.assertContains(response, "Избранное")
-
-    def test_technologies_page(self):
-        response = self.client.get(reverse("technologies"))
-        self.assertContains(response, text="Использованные технологии")
+        self.assertContains(response, text="Изменить пароль")

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 from users.models import User
 
@@ -61,6 +62,9 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("recipe_page", args=[str(self.author.username), str(self.id)])
 
 
 class RecipeIngredient(models.Model):
