@@ -72,6 +72,6 @@ class UserActionsTest(TestCase):
             reverse("remove_favorite", args=[UserActionsTest.recipe.id]),
             content_type="application/json")
         self.assertEqual(response.status_code, 200)
-        self.assertFalse(Follow.objects.filter(
+        self.assertFalse(Favorite.objects.filter(
             user=UserActionsTest.user,
             recipe=UserActionsTest.recipe).exists())
