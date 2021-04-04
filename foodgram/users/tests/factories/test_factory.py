@@ -1,5 +1,5 @@
 import factory
-from faker import Factory
+from django.core.files.base import ContentFile
 
 from recipes.models import Recipe, Ingredient, RecipeIngredient, Tag
 from users.models import User
@@ -36,6 +36,13 @@ class RecipeFactory(factory.django.DjangoModelFactory):
     title = "testtitle"
     description = "description"
     cooking_time = 10
+    image = factory.LazyAttribute(
+            lambda _: ContentFile(
+                factory.django.ImageField()._make_data(
+                    {'width': 1024, 'height': 768}
+                ), 'example.jpg'
+            )
+        )
 
     @factory.post_generation
     def tags(self, create, extracted, **kwargs):

@@ -4,18 +4,14 @@ volumes:
     postgres_data:
     static_volume:
     media_volume:
-
 services:
   db:
     image: postgres:12.4
     volumes:
         - postgres_data:/var/lib/postgresql/data
     env_file:
-        - .env
-  redis:
-    image: redis:5-alpine
-    ports:
-      - "6379:6379"
+        - ./.env
+
   web:
     build: .
     restart: always
@@ -26,7 +22,26 @@ services:
         - db
         - redis
     env_file:
-        - .env
+        - ./.env
+
+  nginx:
+    image: nginx:1.19.5-alpine
+    restart: always
+    volumes:
+        - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+        - static_volume:/foodgram/static
+        - media_volume:/foodgram/media
+    ports:
+        - 80:80
+    depends_on:
+        - web
+        - flower
+
+  redis:
+    image: redis:5-alpine
+    ports:
+      - "6379:6379"
+
   celery:
     build: .
     command: celery worker --app=foodgram --loglevel=info --logfile=logs/celery.log
@@ -39,6 +54,7 @@ services:
       - db
       - redis
       - web
+
   dashboard:
     build: .
     command: flower -A foodgram --port=5555
@@ -50,14 +66,3 @@ services:
       - celery
     env_file:
       - ./.env
-  nginx:
-    image: nginx:1.19.5-alpine
-    restart: always
-    volumes:
-        - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-        - static_volume:/foodgram/static
-        - media_volume:/foodgram/media
-    ports:
-        - 80:80
-    depends_on:
-        - web

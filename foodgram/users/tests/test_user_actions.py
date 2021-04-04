@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from recipes.models import Follow, Favorite, WishList
+from recipes.models import Follow, Favorite
 from .factories import UserFactory, RecipeWithIngredientFactory
 
 
@@ -29,6 +29,12 @@ class UserActionsTest(TestCase):
             with self.subTest():
                 response = self.guest_client.get(url)
                 self.assertRedirects(response, f"/auth/login/?next={url}")
+
+    def test_profile_page(self):
+        response = self.authorized_client.get(
+            reverse("profile_page", args={UserActionsTest.user.username}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"{UserActionsTest.user.username}")
 
     def test_follow(self):
         data = {"id": f"{UserActionsTest.author.id}"}

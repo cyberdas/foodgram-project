@@ -14,7 +14,7 @@ from .models import (Favorite, Follow, Recipe, RecipeIngredient,
 from .tasks import send_email_task
 from .utils import get_ingredients, save_recipe, get_recipes
 
-# index через class based views?
+
 def index(request):
     tag_filters, recipes = get_recipes(request)
     paginator = Paginator(recipes, items_for_pagination)
